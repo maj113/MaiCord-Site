@@ -7,7 +7,7 @@ One static page: HTML and inline CSS, no scripts and no web fonts.
 `site/index.html` is a template: `build.py` fills its `{{placeholders}}` with
 the latest release, its download, CI status and recent changelogs from the
 GitHub API, and `card.py` draws the link preview card (`og.png`) with the same
-release details as a ~13 KB palette PNG, using the bundled Inter fonts in
+release details as a ~9 KB palette PNG, using the bundled Inter fonts in
 `fonts/` (SIL Open Font License, `fonts/OFL.txt`). The finished site goes to
 `_site/`. Preview it locally:
 

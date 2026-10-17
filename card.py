@@ -6,10 +6,11 @@ from a browser, so the output depends only on the inputs, not on whichever
 fonts or browser a machine has.
 """
 import io
+import math
 import os
 
 import oxipng
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageFont, ImageStat
 
 WIDTH, HEIGHT = 1200, 630
 SCALE = 4  # drawn large, then downsampled for smooth edges
@@ -19,6 +20,11 @@ MUTED = (181, 186, 193)
 ACCENT = (88, 101, 242)
 TAGLINE = "A lightweight, native Discord client for Windows"
 FONTS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fonts")
+# The card uses five colours; everything else is antialiased edges. The
+# palette is the smallest that stays within this PSNR of the full-colour
+# drawing, the usual threshold below which differences aren't visible.
+MINIMUM_PSNR = 40.0
+MAXIMUM_COLOURS = 64
 
 
 def font(weight, size):
@@ -49,6 +55,19 @@ def logo(draw, x, y, size):
         draw.ellipse((px - stroke / 2, py - stroke / 2, px + stroke / 2, py + stroke / 2), fill=(255, 255, 255))
 
 
+def psnr(a, b):
+    mse = sum(rms * rms for rms in ImageStat.Stat(ImageChops.difference(a, b)).rms) / 3
+    return math.inf if mse == 0 else 10 * math.log10(255 * 255 / mse)
+
+
+def palette(card):
+    """The smallest undithered palette that keeps the card visually intact."""
+    for colours in range(4, MAXIMUM_COLOURS + 1):
+        reduced = card.quantize(colors=colours, method=Image.Quantize.MAXCOVERAGE, dither=Image.Dither.NONE)
+        if colours == MAXIMUM_COLOURS or psnr(reduced.convert("RGB"), card) >= MINIMUM_PSNR:
+            return reduced
+
+
 def render(details, path):
     """details: the muted line under the tagline, e.g. "v0.3.1 · 5.6 MB"."""
     s = SCALE
@@ -73,9 +92,9 @@ def render(details, path):
 
     # Area averaging gives clean antialiasing; Lanczos rings, which costs bytes.
     card = image.resize((WIDTH, HEIGHT), Image.Resampling.BOX)
-    # A flat card needs few colours: 64 undithered keep the edges smooth, and
-    # oxipng then shrinks the palette PNG to about 13 KB (vs about 44 KB RGB).
-    card = card.quantize(colors=64, method=Image.Quantize.MAXCOVERAGE, dither=Image.Dither.NONE)
+    # About a dozen colours suffice; with oxipng the card is about 9 KB (44 KB
+    # as an RGB PNG).
+    card = palette(card)
     data = io.BytesIO()
     card.save(data, "PNG", optimize=True)
     with open(path, "wb") as f:
