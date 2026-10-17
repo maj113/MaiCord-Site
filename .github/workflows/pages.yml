@@ -1,7 +1,8 @@
 name: Deploy
 
 # Builds the site with live release and CI data from maj113/MaiCord
-# (build.py) and publishes it to GitHub Pages. The hourly run picks up new
+# (build.py), draws the link preview card with the same details (card.py) and
+# publishes both to GitHub Pages. The hourly run picks up new
 # releases and CI results, and deploys only when the page changed. The custom
 # domain (maicord.com) is set in Settings > Pages, not by a CNAME file.
 on:
@@ -30,10 +31,15 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Install the card renderer
+        run: |
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install --quiet --disable-pip-version-check -r requirements.txt
+
       - name: Build
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: python3 build.py --out _site
+        run: '"$RUNNER_TEMP/venv/bin/python" build.py --out _site'
 
       # Pushes and manual runs always deploy; a scheduled run deploys only
       # when the page differs from the live one (or the live one is unreachable).

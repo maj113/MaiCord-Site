@@ -1,0 +1,2 @@
+pillow==13.0.0
+pyoxipng==9.1.1

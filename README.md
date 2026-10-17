@@ -4,11 +4,15 @@ The website for [MaiCord](https://github.com/maj113/MaiCord), a lightweight,
 native Discord client for Windows: https://maicord.com/
 
 One static page: HTML and inline CSS, no scripts and no web fonts.
-`site/index.html` is a template: `build.py` (Python standard library only)
-fills its `{{placeholders}}` with the latest release, its download, CI status
-and recent changelogs from the GitHub API, writing the finished site to
-`_site/`. Preview it locally with `python3 build.py` and open
-`_site/index.html`.
+`site/index.html` is a template: `build.py` fills its `{{placeholders}}` with
+the latest release, its download, CI status and recent changelogs from the
+GitHub API, and `card.py` draws the link preview card (`og.png`) with the same
+release details as a ~13 KB palette PNG, using the bundled Inter fonts in
+`fonts/` (SIL Open Font License, `fonts/OFL.txt`). The finished site goes to
+`_site/`. Preview it locally:
+
+    python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+    .venv/bin/python build.py   # then open _site/index.html
 
 `.github/workflows/pages.yml` builds and deploys on every push to `master` and
 checks hourly for new releases or CI results, deploying only when the page

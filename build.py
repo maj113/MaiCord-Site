@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Builds the site: copies site/ to the output directory and fills the
+"""Builds the site: copies site/ to the output directory, fills the
 {{placeholders}} in index.html with live data from the MaiCord repository
-(latest release, its download, CI status and recent changelogs).
+(latest release, its download, CI status and recent changelogs) and draws the
+link preview card (og.png) with the same release details.
 
 The output is deterministic for the same data, so the deploy workflow can
 skip a deploy when nothing changed.
 
+    pip install -r requirements.txt
     python3 build.py [--out _site]
 
 GITHUB_TOKEN, when set, raises the API rate limit; public data needs none.
@@ -19,6 +21,8 @@ import re
 import shutil
 import sys
 import urllib.request
+
+import card
 
 REPO = "maj113/MaiCord"
 API = "https://api.github.com/repos/" + REPO
@@ -167,6 +171,8 @@ def build(out):
     text = re.sub(r"\{\{(\w+)\}\}", lambda m: values[m[1]], text)
     with open(page, "w", encoding="utf-8", newline="\n") as f:
         f.write(text)
+    card.render(f"v{latest['tag_name'].lstrip('v')} · {values['release_date_short']} · "
+                f"{values['download_size']} download · No Electron", os.path.join(out, "og.png"))
     print(f"Built {out}: {values['version']} ({values['release_date']}), CI {values['ci_state']}")
 
 
