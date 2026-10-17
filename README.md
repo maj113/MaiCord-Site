@@ -3,9 +3,10 @@
 The website for [MaiCord](https://github.com/maj113/MaiCord), a lightweight,
 native Discord client for Windows: https://maicord.com/
 
-One static page: HTML and inline CSS, no scripts, no web fonts, no build step.
-GitHub Pages serves this branch as is (Settings > Pages > Deploy from a
-branch > `master` / root), at the custom domain in `CNAME`.
+One static page in `site/`: HTML and inline CSS, no scripts, no web fonts, no
+build step. `.github/workflows/pages.yml` publishes `site/` as is on every
+push to `master` (Settings > Pages > Source: GitHub Actions). The custom domain
+is set in Settings > Pages.
 
 The update channels the client polls are served separately, from the MaiCord
 repository's own Pages site at `maj113.github.io/MaiCord/`, and are not part
