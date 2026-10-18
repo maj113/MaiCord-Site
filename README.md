@@ -3,7 +3,13 @@
 The website for [MaiCord](https://github.com/maj113/MaiCord), a lightweight,
 native Discord client for Windows: https://maicord.com/
 
-One static page: HTML and inline CSS, no scripts and no web fonts.
+One static page: HTML and inline CSS, no web fonts, and one inline script for
+the theme picker and the backdrop. The picker keeps the chosen theme in
+`localStorage` under `theme` and nothing else. The backdrop's stars and comets
+are MaiCord's own effect shader ported to WebGL 2; without scripts the page
+shows the default theme with static stars. The theme colours come from
+`theme_tokens.py`, a port of the client's theme maths: run it to print the CSS
+and a contrast table.
 `site/index.html` is a template: `build.py` fills its `{{placeholders}}` with
 the latest release, its download, CI status and recent changelogs from the
 GitHub API, and `card.py` draws the link preview card (`og.png`) with the same
@@ -16,9 +22,9 @@ directory, read with HTTP range requests. The finished site goes to `_site/`. Pr
     .venv/bin/python build.py   # then open _site/index.html
 
 `site/screenshots/` holds renderer captures from MaiCord's opt-in showcase
-probe (`tests/integration/showcase_probe.cpp`) with invented data, as AVIF and
-WebP at 1x and 2x and a 1x PNG fallback. The hero is an animated WebP/AVIF
-loop (`hero-live`) whose first frame is the still shown for reduced motion.
+probe (`tests/integration/showcase_probe.cpp`) with invented data, as AVIF at
+1x and 2x. The hero is an animated AVIF loop (`hero-live`) whose first frame is
+the still shown for reduced motion.
 
 `.github/workflows/pages.yml` builds and deploys on every push to `master` and
 checks hourly for new releases or CI results, deploying only when the page

@@ -7,6 +7,7 @@
 <meta name="description" content="MaiCord is a free, open-source Discord client for Windows written in C++ with Direct3D 11. No Electron and no browser engine: a {{download_size}} portable download that idles at near-zero CPU.">
 <link rel="canonical" href="https://maicord.com/">
 <meta name="color-scheme" content="dark light">
+<script>try{var t=localStorage.getItem("theme");if(/^(dark|light|amoled|aurora|sunset|ocean|aurora-light)$/.test(t))document.documentElement.dataset.theme=t}catch(e){}</script>
 <meta name="theme-color" content="#1a1a1e" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#f9fafc" media="(prefers-color-scheme: light)">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -37,11 +38,11 @@
   "fileSize": "{{download_size}}",
   "image": "https://maicord.com/og.png?v={{version}}",
   "screenshot": [
-    {"@type": "ImageObject", "url": "https://maicord.com/screenshots/hero.png", "width": 1440, "height": 900, "caption": "The Aurora gradient theme with its stars and comets"},
-    {"@type": "ImageObject", "url": "https://maicord.com/screenshots/dark.png", "width": 1440, "height": 900, "caption": "A server channel in the dark theme"},
-    {"@type": "ImageObject", "url": "https://maicord.com/screenshots/light.png", "width": 1440, "height": 900, "caption": "The light theme"},
-    {"@type": "ImageObject", "url": "https://maicord.com/screenshots/profile.png", "width": 1440, "height": 900, "caption": "A profile popout with a game activity"},
-    {"@type": "ImageObject", "url": "https://maicord.com/screenshots/settings.png", "width": 1440, "height": 900, "caption": "Appearance settings"}
+    {"@type": "ImageObject", "url": "https://maicord.com/screenshots/hero.avif", "width": 1440, "height": 900, "caption": "The Aurora gradient theme with its stars and comets"},
+    {"@type": "ImageObject", "url": "https://maicord.com/screenshots/dark.avif", "width": 1440, "height": 900, "caption": "A server channel in the dark theme"},
+    {"@type": "ImageObject", "url": "https://maicord.com/screenshots/light.avif", "width": 1440, "height": 900, "caption": "The light theme"},
+    {"@type": "ImageObject", "url": "https://maicord.com/screenshots/profile.avif", "width": 1440, "height": 900, "caption": "A profile popout with a game activity"},
+    {"@type": "ImageObject", "url": "https://maicord.com/screenshots/settings.avif", "width": 1440, "height": 900, "caption": "Appearance settings"}
   ],
   "license": "https://www.mozilla.org/en-US/MPL/2.0/",
   "isAccessibleForFree": true,
@@ -50,23 +51,20 @@
 }
 </script>
 <style>
+@property --g1 { syntax: "<color>"; inherits: true; initial-value: #0000; }
+@property --g2 { syntax: "<color>"; inherits: true; initial-value: #0000; }
+@property --g3 { syntax: "<color>"; inherits: true; initial-value: #0000; }
 :root {
-  --bg: #1a1a1e; --surface: #222225; --raised: #2a2a2e; --line: #35353a;
-  --text: #f2f4f7; --muted: #b5bac1; --accent: #5865f2; --accent-hover: #4752c4; --on-accent: #fff;
   --ok: #23a55a; --ok-ring: rgba(35, 165, 90, .2); --bad: #f25252; --bad-ring: rgba(242, 82, 82, .2);
   --radius: 8px; --radius-lg: 12px;
+  transition: --g1 .8s, --g2 .8s, --g3 .8s;
   font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, Helvetica, Arial, sans-serif;
 }
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg: #f9fafc; --surface: #fff; --raised: #f2f5fa; --line: #e3e6ee;
-    --text: #1c1f26; --muted: #5c616e;
-  }
-}
+{{theme_css}}
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body { margin: 0; background: var(--bg); color: var(--text); line-height: 1.55; font-size: 16px; }
-a { color: var(--accent); text-decoration: none; }
+a { color: var(--link); text-decoration: none; }
 a:hover { text-decoration: underline; }
 .wrap { max-width: 960px; margin: 0 auto; padding: 0 20px; }
 nav { display: flex; align-items: center; gap: 24px; height: 64px; }
@@ -99,8 +97,8 @@ h1 { font-size: clamp(34px, 6vw, 52px); line-height: 1.1; letter-spacing: -0.02e
 .gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px 16px; }
 .gallery figure { margin: 0; }
 .gallery figcaption { color: var(--muted); font-size: 14px; margin-top: 10px; }
-.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; margin: 0 0 80px; }
-.stats div { background: var(--surface); padding: 20px; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; margin: 0 0 80px; }
+.stats div { background: var(--surface); padding: 20px; box-shadow: 0 0 0 1px var(--line); }
 .stats b { display: block; font-size: 26px; letter-spacing: -0.01em; }
 .stats span { color: var(--muted); font-size: 14px; }
 section { margin: 0 0 80px; }
@@ -135,6 +133,29 @@ footer { border-top: 1px solid var(--line); padding: 28px 0 40px; color: var(--m
 footer .links { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 12px; }
 footer a { color: var(--muted); }
 footer a:hover { color: var(--text); }
+.picker { position: relative; }
+.picker > button { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 1px solid var(--line); border-radius: var(--radius); background: none; cursor: pointer; }
+.picker > button::before, .picker [role=menuitemradio]::before { content: ""; width: 18px; height: 18px; border-radius: 5px; background: linear-gradient(120deg, var(--cur)); box-shadow: inset 0 0 0 1px rgb(128 128 128 / .35); }
+.picker > button:hover, .picker > button[aria-expanded=true] { border-color: var(--muted); }
+.picker button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+#theme-menu { position: absolute; z-index: 1; right: 0; top: calc(100% + 8px); min-width: 176px; padding: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: 0 8px 24px rgb(0 0 0 / .3); }
+.picker [role=menuitemradio] { display: flex; align-items: center; gap: 10px; width: 100%; padding: 7px 10px; border: 0; border-radius: 6px; background: none; color: var(--text); font: inherit; font-size: 14px; text-align: left; cursor: pointer; }
+.picker [role=menuitemradio]:hover, .picker [role=menuitemradio]:focus-visible { background: var(--raised); outline-offset: -2px; }
+.picker [aria-checked=true]::after { content: "✓"; margin-left: auto; color: var(--accent); }
+@supports (color: color-mix(in srgb, red 50%, #0000)) {
+  .stats div, .card, details, .status, .shot img, .gallery img { background: color-mix(in srgb, var(--surface) var(--veil), #0000); }
+}
+/* Backdrop: the gradient, the effect canvas the script adds (.fx), else static stars: one dot per
+   tile, prime tile sizes hide the repeat. */
+.sky { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; transition: opacity .8s, visibility .8s;
+  --mid: radial-gradient(circle, rgb(var(--ink) / .25) 0 .8px, #0000 1.4px); --dim: radial-gradient(circle, rgb(var(--ink) / .12) 0 .8px, #0000 1.4px);
+  background: var(--mid) 61px 83px / 271px 317px, var(--mid) 240px 129px / 389px 347px, var(--mid) 330px 260px / 457px 433px,
+    var(--dim) 31px 47px / 233px 281px, var(--dim) 197px 11px / 307px 263px, var(--dim) 5px 220px / 359px 331px,
+    var(--dim) 290px 140px / 401px 373px, var(--dim) 120px 330px / 449px 419px,
+    linear-gradient(120deg, var(--g1), var(--g2), var(--g3)); }
+.fx .sky { background: linear-gradient(120deg, var(--g1), var(--g2), var(--g3)); }
+.sky canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+:root[data-theme=dark] .sky, :root[data-theme=light] .sky { opacity: 0; visibility: hidden; }
 @media (max-width: 760px) {
   nav a.hide { display: none; }
   header.hero { padding: 24px 0 32px; }
@@ -151,6 +172,7 @@ footer a:hover { color: var(--text); }
 </style>
 </head>
 <body>
+<div class="sky" aria-hidden="true"></div>
 <div class="wrap">
 <nav>
   <a class="brand" href="./"><svg class="logo" viewBox="0 0 176 176" aria-hidden="true"><rect width="176" height="176" rx="53" fill="#5865f2"/><path d="M49.3 125V54.6L88 96.8l38.7-42.2V125" fill="none" stroke="#fff" stroke-width="25" stroke-linecap="round" stroke-linejoin="round"/></svg>MaiCord</a>
@@ -160,6 +182,18 @@ footer a:hover { color: var(--text); }
   <a class="hide" href="#changelog">Changelog</a>
   <a class="hide" href="#faq">FAQ</a>
   <a href="https://github.com/maj113/MaiCord">GitHub</a>
+  <div class="picker" hidden>
+    <button type="button" id="theme-button" aria-haspopup="menu" aria-expanded="false" aria-controls="theme-menu" aria-label="Theme"></button>
+    <div id="theme-menu" role="menu" aria-label="Theme" hidden>
+      <button type="button" role="menuitemradio" tabindex="-1" data-theme="dark">Dark</button>
+      <button type="button" role="menuitemradio" tabindex="-1" data-theme="light">Light</button>
+      <button type="button" role="menuitemradio" tabindex="-1" data-theme="amoled">AMOLED</button>
+      <button type="button" role="menuitemradio" tabindex="-1" data-theme="aurora">Aurora</button>
+      <button type="button" role="menuitemradio" tabindex="-1" data-theme="sunset">Sunset</button>
+      <button type="button" role="menuitemradio" tabindex="-1" data-theme="ocean">Ocean</button>
+      <button type="button" role="menuitemradio" tabindex="-1" data-theme="aurora-light">Aurora light</button>
+    </div>
+  </div>
 </nav>
 
 <header class="hero">
@@ -173,7 +207,7 @@ footer a:hover { color: var(--text); }
   <p class="fine">Free and open source (MPL-2.0) · Windows 10 and 11, 64-bit · Updates itself · <a href="https://github.com/maj113/MaiCord/releases">All releases</a></p>
 </header>
 
-<figure class="shot"><picture><source media="(prefers-reduced-motion: reduce)" type="image/avif" srcset="screenshots/hero.avif 1440w, screenshots/hero@2x.avif 2880w" sizes="(max-width: 960px) calc(100vw - 40px), 920px"><source media="(prefers-reduced-motion: reduce)" type="image/webp" srcset="screenshots/hero.webp 1440w, screenshots/hero@2x.webp 2880w" sizes="(max-width: 960px) calc(100vw - 40px), 920px"><source type="image/avif" srcset="screenshots/hero-live.avif"><source type="image/webp" srcset="screenshots/hero-live.webp"><img src="screenshots/hero.png" width="1440" height="900" fetchpriority="high" decoding="async" alt="MaiCord in the Aurora gradient theme, with stars and comets drifting behind a #general channel. Juniper finishes typing and posts, reactions come in and Ada replies. Around the conversation: the server list, the channel list, the header with search, server tags beside names and the member list grouped by role."></picture></figure>
+<figure class="shot"><picture><source media="(prefers-reduced-motion: reduce)" srcset="screenshots/hero.avif 1440w, screenshots/hero@2x.avif 2880w" sizes="(max-width: 960px) calc(100vw - 40px), 920px"><img src="screenshots/hero-live.avif" width="1440" height="900" fetchpriority="high" decoding="async" alt="MaiCord in the Aurora gradient theme, with stars and comets drifting behind a #general channel. Juniper finishes typing and posts, reactions come in and Ada replies. Around the conversation: the server list, the channel list, the header with search, server tags beside names and the member list grouped by role."></picture></figure>
 
 <div class="stats">
   <div><b>{{download_size}}</b><span>portable download</span></div>
@@ -191,10 +225,10 @@ footer a:hover { color: var(--text); }
   <h2>Screenshots</h2>
   <p>Every pixel below is drawn by MaiCord's own Direct3D&nbsp;11 renderer. The people, servers and messages are made up.</p>
   <div class="gallery">
-    <figure><picture><source type="image/avif" srcset="screenshots/dark.avif 1440w, screenshots/dark@2x.avif 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px"><source type="image/webp" srcset="screenshots/dark.webp 1440w, screenshots/dark@2x.webp 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px"><img src="screenshots/dark.png" width="1440" height="900" loading="lazy" decoding="async" alt="The same channel in the dark theme: an image with reactions, a reply, a link preview, server tags and the member list."></picture><figcaption>The dark theme.</figcaption></figure>
-    <figure><picture><source type="image/avif" srcset="screenshots/light.avif 1440w, screenshots/light@2x.avif 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px"><source type="image/webp" srcset="screenshots/light.webp 1440w, screenshots/light@2x.webp 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px"><img src="screenshots/light.png" width="1440" height="900" loading="lazy" decoding="async" alt="The same channel in the light theme."></picture><figcaption>The light theme.</figcaption></figure>
-    <figure><picture><source type="image/avif" srcset="screenshots/profile.avif 1440w, screenshots/profile@2x.avif 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px"><source type="image/webp" srcset="screenshots/profile.webp 1440w, screenshots/profile@2x.webp 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px"><img src="screenshots/profile.png" width="1440" height="900" loading="lazy" decoding="async" alt="A profile popout over the channel, showing a banner, bio, server tag, role and a game activity card with artwork and elapsed time."></picture><figcaption>Profiles with roles and rich presence.</figcaption></figure>
-    <figure><picture><source type="image/avif" srcset="screenshots/settings.avif 1440w, screenshots/settings@2x.avif 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px"><source type="image/webp" srcset="screenshots/settings.webp 1440w, screenshots/settings@2x.webp 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px"><img src="screenshots/settings.png" width="1440" height="900" loading="lazy" decoding="async" alt="The Appearance page of MaiCord's settings, with theme and colour-theme choices."></picture><figcaption>Appearance settings.</figcaption></figure>
+    <figure><img src="screenshots/dark.avif" srcset="screenshots/dark.avif 1440w, screenshots/dark@2x.avif 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px" width="1440" height="900" loading="lazy" decoding="async" alt="The same channel in the dark theme: an image with reactions, a reply, a link preview, server tags and the member list."><figcaption>The dark theme.</figcaption></figure>
+    <figure><img src="screenshots/light.avif" srcset="screenshots/light.avif 1440w, screenshots/light@2x.avif 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px" width="1440" height="900" loading="lazy" decoding="async" alt="The same channel in the light theme."><figcaption>The light theme.</figcaption></figure>
+    <figure><img src="screenshots/profile.avif" srcset="screenshots/profile.avif 1440w, screenshots/profile@2x.avif 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px" width="1440" height="900" loading="lazy" decoding="async" alt="A profile popout over the channel, showing a banner, bio, server tag, role and a game activity card with artwork and elapsed time."><figcaption>Profiles with roles and rich presence.</figcaption></figure>
+    <figure><img src="screenshots/settings.avif" srcset="screenshots/settings.avif 1440w, screenshots/settings@2x.avif 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px" width="1440" height="900" loading="lazy" decoding="async" alt="The Appearance page of MaiCord's settings, with theme and colour-theme choices."><figcaption>Appearance settings.</figcaption></figure>
   </div>
 </section>
 
@@ -281,5 +315,160 @@ footer a:hover { color: var(--text); }
     <p>* Measured on the developer's machine; your numbers will differ. MaiCord is not affiliated with Discord Inc. Discord is a trademark of Discord Inc.</p>
   </div>
 </footer>
+<script>
+(() => {
+  const root = document.documentElement, picker = document.querySelector(".picker"), button = picker.firstElementChild,
+    menu = button.nextElementSibling, items = [...menu.children], light = matchMedia("(prefers-color-scheme: light)");
+  // Until a theme is chosen, Aurora or Aurora light follows the system scheme.
+  const current = () => root.dataset.theme || (light.matches ? "aurora-light" : "aurora");
+  const mark = () => {
+    for (const item of items) item.setAttribute("aria-checked", item.dataset.theme === current());
+    wake();
+  };
+  const show = open => {
+    menu.hidden = !open;
+    button.setAttribute("aria-expanded", open);
+    if (open) menu.querySelector("[aria-checked=true]").focus();
+  };
+  if (!items.some(i => i.dataset.theme === root.dataset.theme)) delete root.dataset.theme;
+  button.onclick = () => show(menu.hidden);
+  button.onkeydown = e => { if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); show(true); } };
+  menu.onclick = e => {
+    const item = e.target.closest("button");
+    if (!item) return;
+    root.dataset.theme = item.dataset.theme;
+    try { localStorage.setItem("theme", item.dataset.theme); } catch {}
+    mark();
+    show(false);
+    button.focus();
+  };
+  menu.onkeydown = e => {
+    const keys = { ArrowDown: 1, ArrowUp: -1, Home: -99, End: 99 }, n = items.length;
+    if (e.key === "Escape") { show(false); button.focus(); }
+    else if (e.key === "Tab") show(false);
+    else if (e.key in keys) {
+      e.preventDefault();
+      const step = keys[e.key], at = items.indexOf(document.activeElement);
+      items[Math.abs(step) > 1 ? (step < 0 ? 0 : n - 1) : (at + step + n) % n].focus();
+    }
+  };
+  document.addEventListener("click", e => { if (!menu.hidden && !picker.contains(e.target)) show(false); });
+
+  // Motion rests after a minute without input: the animated hero (a steady AV1
+  // decode) shows its first frame and the backdrop effect holds its last frame.
+  const hero = document.querySelector(".shot img"), live = hero.getAttribute("src");
+  let seen = performance.now();
+  for (const type of ["pointermove", "keydown", "scroll", "touchstart"])
+    addEventListener(type, () => {
+      seen = performance.now();
+      if (hero.getAttribute("src") !== live) hero.src = live;
+      wake();
+    }, { passive: true });
+  setInterval(() => { if (performance.now() - seen > 60000) hero.src = "screenshots/hero.avif"; }, 5000);
+
+  // Stars and Comets: MaiCord's fx_builtin (src/render/shaders/background_fx.hlsl) at the
+  // client's default speed, density and strength, in CSS pixels where the client uses DIPs.
+  // At most 30 fps; none for reduced motion; without WebGL 2 the CSS stars stay.
+  const sky = document.querySelector(".sky"), canvas = document.createElement("canvas");
+  let gl = !matchMedia("(prefers-reduced-motion: reduce)").matches &&
+    canvas.getContext("webgl2", { antialias: false, depth: false, stencil: false, powerPreference: "low-power" });
+  let draw, pending = false, dark = 1;
+  if (gl) {
+    const program = gl.createProgram();
+    for (const [type, source] of [[gl.VERTEX_SHADER, `#version 300 es
+void main() { gl_Position = vec4(vec2(gl_VertexID & 1, gl_VertexID >> 1) * 4. - 1., 0, 1); }`],
+      [gl.FRAGMENT_SHADER, `#version 300 es
+precision highp float;
+uniform float time, dark;
+uniform vec3 view, settings;
+out vec4 color;
+float hash(vec2 cell) {
+  vec3 p = fract(vec3(cell.xyx) * .1031);
+  p += dot(p, p.yzx + 33.33);
+  return fract((p.x + p.y) * p.z);
+}
+void main() {
+  float speed = settings.x, density = settings.y, strength = settings.z, t = time * speed, detail = 0.;
+  vec2 extent = view.xy / view.z, coordinate = vec2(gl_FragCoord.x, view.y - gl_FragCoord.y) / view.z;
+  float pitch = mix(180., 48., density);
+  vec2 cell = floor(coordinate / pitch);
+  float seed = hash(cell);
+  vec2 center = (cell + vec2(.15 + seed * .7, .15 + hash(cell + 13.) * .7)) * pitch;
+  float distance = length(coordinate - center);
+  float star = clamp((1.1 + seed * .8 - distance) / max(fwidth(distance), .5), 0., 1.) +
+               exp2(-distance * distance * .14) * .12;
+  float clock = t / (2.5 + seed * 5.) + seed * 11., window = floor(clock), progress = fract(clock);
+  float pulseSeed = hash(cell + vec2(window * 17.1, window * .7));
+  float offset = (progress - (.2 + pulseSeed * .6)) / (.08 + hash(cell + window + 29.) * .12);
+  float pulse = exp2(-offset * offset * 4.) * smoothstep(0., .08, progress) * (1. - smoothstep(.92, 1., progress));
+  detail += star * (.07 + pulse * .93);
+  int lanes = clamp(int(ceil(density * 4.)), 1, 4);
+  for (int lane = 0; lane < lanes; ++lane) {
+    float laneSeed = hash(vec2(37. + float(lane), 19.));
+    float laneClock = t / (7. + laneSeed * 8.) + .16 + laneSeed * .45;
+    float laneWindow = floor(laneClock), cycle = fract(laneClock);
+    float eventSeed = hash(vec2(float(lane) + 71., laneWindow + 53.));
+    float slope = (eventSeed < .5 ? -1. : 1.) * (.18 + hash(vec2(float(lane) + 17., laneWindow + 91.)) * .24);
+    vec2 path = vec2((extent.y + 96.) * slope, extent.y + 96.), axis = normalize(path);
+    vec2 delta = coordinate - vec2(extent.x * (.225 + eventSeed * .55) - path.x * .5, -48.) - path * cycle;
+    float along = dot(delta, axis), across = dot(delta, vec2(-axis.y, axis.x));
+    float tail = clamp(1. + along / 36., 0., 1.) * step(along, 0.) * exp2(-across * across * .7);
+    float head = exp2(-dot(delta, delta) * .5);
+    float fade = smoothstep(.03, .13, cycle) * (1. - smoothstep(.82, .96, cycle));
+    detail += (tail * .8 + head) * fade;
+  }
+  // Additive light ink on dark themes, a lerp toward dark ink on light ones.
+  float amount = min(clamp(detail, 0., 1.) * strength * .38, .42);
+  color = dark > .5 ? vec4(vec3(.82, .9, 1.) * amount, 0.) : vec4(vec3(.1, .18, .3) * amount, amount);
+}`]]) {
+      const shader = gl.createShader(type);
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+      gl.attachShader(program, shader);
+    }
+    gl.linkProgram(program);
+    if (gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      gl.useProgram(program);
+      const uniform = name => gl.getUniformLocation(program, name), time = uniform("time"), view = uniform("view"),
+        ink = uniform("dark");
+      // The hero screenshot's settings (showcase probe): speed 80, density 80, strength 100.
+      gl.uniform3f(uniform("settings"), .8, .8, 1);
+      draw = () => {
+        const scale = Math.min(devicePixelRatio, 2), width = Math.round(sky.clientWidth * scale),
+          height = Math.round(sky.clientHeight * scale);
+        if (canvas.width !== width || canvas.height !== height) {
+          canvas.width = width;
+          canvas.height = height;
+          gl.viewport(0, 0, width, height);
+        }
+        gl.uniform3f(view, width, height, scale);
+        gl.uniform1f(ink, dark);
+        gl.uniform1f(time, performance.now() / 1000);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+      };
+      canvas.addEventListener("webglcontextlost", () => { gl = null; canvas.remove(); root.classList.remove("fx"); });
+      sky.append(canvas);
+      root.classList.add("fx");
+    } else gl = null;
+  }
+  const tick = () => {
+    pending = gl && !document.hidden && !/^(dark|light)$/.test(current()) && performance.now() - seen < 60000;
+    if (!pending) return;
+    draw();
+    setTimeout(() => requestAnimationFrame(tick), 1000 / 30);
+  };
+  function wake() {
+    dark = getComputedStyle(root).colorScheme === "light" ? 0 : 1;
+    if (!pending) {
+      pending = true;
+      requestAnimationFrame(tick);
+    }
+  }
+  document.addEventListener("visibilitychange", wake);
+  light.addEventListener("change", mark);
+  mark();
+  picker.hidden = false;
+})();
+</script>
 </body>
 </html>

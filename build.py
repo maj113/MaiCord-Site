@@ -2,8 +2,8 @@
 """Builds the site: copies site/ to the output directory, fills the
 {{placeholders}} in index.html and sitemap.xml with live data from the MaiCord
 repository (latest release, its download and size on disk, CI status and
-recent changelogs) and draws the link preview card (og.png) and the
-apple-touch-icon.
+recent changelogs) and the theme colours (theme_tokens.py), and draws the link
+preview card (og.png) and the apple-touch-icon.
 
 The output is deterministic for the same data, so the deploy workflow can
 skip a deploy when nothing changed.
@@ -26,6 +26,7 @@ import urllib.request
 import zipfile
 
 import card
+import theme_tokens
 
 REPO = "maj113/MaiCord"
 API = "https://api.github.com/repos/" + REPO
@@ -210,6 +211,7 @@ def build(out):
         # status does, so hourly builds don't redeploy for every CI run.
         "ci_url": f"https://github.com/{REPO}/actions/workflows/ci.yml?query=branch%3Amaster",
         "changelog": "\n".join(entries),
+        "theme_css": theme_tokens.css(),
     }
 
     if os.path.exists(out):
