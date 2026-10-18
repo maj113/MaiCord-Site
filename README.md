@@ -8,11 +8,17 @@ One static page: HTML and inline CSS, no scripts and no web fonts.
 the latest release, its download, CI status and recent changelogs from the
 GitHub API, and `card.py` draws the link preview card (`og.png`) with the same
 release details as a ~9 KB palette PNG, using the bundled Inter fonts in
-`fonts/` (SIL Open Font License, `fonts/OFL.txt`). The finished site goes to
-`_site/`. Preview it locally:
+`fonts/` (SIL Open Font License, `fonts/OFL.txt`), and the
+`apple-touch-icon.png`. The size on disk is summed from the release zip's
+directory, read with HTTP range requests. The finished site goes to `_site/`. Preview it locally:
 
     python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
     .venv/bin/python build.py   # then open _site/index.html
+
+`site/screenshots/` holds renderer captures from MaiCord's opt-in showcase
+probe (`tests/integration/showcase_probe.cpp`) with invented data, as AVIF and
+WebP at 1x and 2x and a 1x PNG fallback. The hero is an animated WebP/AVIF
+loop (`hero-live`) whose first frame is the still shown for reduced motion.
 
 `.github/workflows/pages.yml` builds and deploys on every push to `master` and
 checks hourly for new releases or CI results, deploying only when the page

@@ -10,12 +10,14 @@
 <meta name="theme-color" content="#1a1a1e" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#f9fafc" media="(prefers-color-scheme: light)">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="MaiCord">
 <meta property="og:title" content="MaiCord — a lightweight, native Discord client for Windows">
 <meta property="og:description" content="No Electron, no browser engine. A {{download_size}} portable Discord client written in C++ that idles at near-zero CPU.">
 <meta property="og:url" content="https://maicord.com/">
 <meta property="og:image" content="https://maicord.com/og.png?v={{version}}">
+<meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="MaiCord, a native Discord client for Windows">
@@ -34,6 +36,13 @@
   "datePublished": "{{release_date_iso}}",
   "fileSize": "{{download_size}}",
   "image": "https://maicord.com/og.png?v={{version}}",
+  "screenshot": [
+    {"@type": "ImageObject", "url": "https://maicord.com/screenshots/hero.png", "width": 1440, "height": 900, "caption": "The Aurora gradient theme with its stars and comets"},
+    {"@type": "ImageObject", "url": "https://maicord.com/screenshots/dark.png", "width": 1440, "height": 900, "caption": "A server channel in the dark theme"},
+    {"@type": "ImageObject", "url": "https://maicord.com/screenshots/light.png", "width": 1440, "height": 900, "caption": "The light theme"},
+    {"@type": "ImageObject", "url": "https://maicord.com/screenshots/profile.png", "width": 1440, "height": 900, "caption": "A profile popout with a game activity"},
+    {"@type": "ImageObject", "url": "https://maicord.com/screenshots/settings.png", "width": 1440, "height": 900, "caption": "Appearance settings"}
+  ],
   "license": "https://www.mozilla.org/en-US/MPL/2.0/",
   "isAccessibleForFree": true,
   "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
@@ -66,8 +75,8 @@ nav .brand:hover { text-decoration: none; }
 nav a:not(.brand) { color: var(--muted); font-size: 15px; }
 nav a:not(.brand):hover { color: var(--text); text-decoration: none; }
 .logo { width: 28px; height: 28px; flex: none; }
-header.hero { padding: 64px 0 56px; }
-.status { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin: 0 0 24px; padding: 6px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--muted); font-size: 14px; }
+header.hero { padding: 28px 0 40px; }
+.status { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin: 0 0 0 auto; padding: 0 16px; min-height: 44px; box-sizing: border-box; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--muted); font-size: 14px; }
 .status a { color: var(--text); font-weight: 600; }
 .status a.ci { color: var(--muted); font-weight: 400; }
 .status a:hover { text-decoration: none; color: var(--accent); }
@@ -75,7 +84,7 @@ header.hero { padding: 64px 0 56px; }
 .dot.ok { background: var(--ok); box-shadow: 0 0 0 3px var(--ok-ring); }
 .dot.bad { background: var(--bad); box-shadow: 0 0 0 3px var(--bad-ring); }
 h1 { font-size: clamp(34px, 6vw, 52px); line-height: 1.1; letter-spacing: -0.02em; margin: 0 0 18px; max-width: 14em; }
-.lead { font-size: 19px; color: var(--muted); max-width: 36em; margin: 0 0 32px; }
+.lead { font-size: 19px; color: var(--muted); max-width: 36em; margin: 0 0 28px; }
 .actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
 .button { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 20px; border-radius: var(--radius); font-weight: 600; font-size: 15px; }
 .button:hover { text-decoration: none; }
@@ -84,6 +93,12 @@ h1 { font-size: clamp(34px, 6vw, 52px); line-height: 1.1; letter-spacing: -0.02e
 .secondary { background: var(--raised); color: var(--text); border: 1px solid var(--line); }
 .secondary:hover { border-color: var(--muted); }
 .fine { color: var(--muted); font-size: 14px; margin: 16px 0 0; }
+.narrow { display: none; }
+.shot { margin: 0 0 56px; }
+.shot img, .gallery img { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); }
+.gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px 16px; }
+.gallery figure { margin: 0; }
+.gallery figcaption { color: var(--muted); font-size: 14px; margin-top: 10px; }
 .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; margin: 0 0 80px; }
 .stats div { background: var(--surface); padding: 20px; }
 .stats b { display: block; font-size: 26px; letter-spacing: -0.01em; }
@@ -122,9 +137,15 @@ footer a { color: var(--muted); }
 footer a:hover { color: var(--text); }
 @media (max-width: 760px) {
   nav a.hide { display: none; }
-  header.hero { padding: 40px 0 40px; }
+  header.hero { padding: 24px 0 32px; }
+  .actions { gap: 8px; }
+  .actions .button { flex: 1 1 0; justify-content: center; padding: 0 12px; font-size: 14px; white-space: nowrap; }
+  .wide { display: none; }
+  .narrow { display: inline; }
+  .status { flex: 1 0 100%; justify-content: center; margin-left: 0; }
   .stats { grid-template-columns: repeat(2, 1fr); margin-bottom: 56px; }
-  .grid { grid-template-columns: 1fr; }
+  .grid, .gallery { grid-template-columns: 1fr; }
+  .shot { margin-bottom: 40px; }
   section { margin-bottom: 56px; }
 }
 </style>
@@ -133,6 +154,7 @@ footer a:hover { color: var(--text); }
 <div class="wrap">
 <nav>
   <a class="brand" href="./"><svg class="logo" viewBox="0 0 176 176" aria-hidden="true"><rect width="176" height="176" rx="53" fill="#5865f2"/><path d="M49.3 125V54.6L88 96.8l38.7-42.2V125" fill="none" stroke="#fff" stroke-width="25" stroke-linecap="round" stroke-linejoin="round"/></svg>MaiCord</a>
+  <a class="hide" href="#screenshots">Screenshots</a>
   <a class="hide" href="#features">Features</a>
   <a class="hide" href="#install">Install</a>
   <a class="hide" href="#changelog">Changelog</a>
@@ -141,19 +163,21 @@ footer a:hover { color: var(--text); }
 </nav>
 
 <header class="hero">
-  <p class="status"><a href="#changelog">v{{version}}</a><time datetime="{{release_date_iso}}">{{release_date_short}}</time><a class="ci" href="{{ci_url}}"><span class="dot {{ci_class}}"></span>Build {{ci_state}}</a></p>
   <h1>A lightweight, native Discord client for Windows</h1>
   <p class="lead">MaiCord is written from scratch in C++ and draws its own interface with Direct3D&nbsp;11. No Electron, no browser engine, nothing to install: one small portable app that stays out of your way.</p>
   <div class="actions">
-    <a class="button primary" href="{{download_url}}">Download v{{version}} <small>{{download_size}}</small></a>
-    <a class="button secondary" href="https://github.com/maj113/MaiCord">View source on GitHub</a>
+    <a class="button primary" href="{{download_url}}"><span>Download<span class="wide"> v{{version}}</span></span> <small>{{download_size}}</small></a>
+    <a class="button secondary" href="https://github.com/maj113/MaiCord"><span><span class="wide">View source</span><span class="narrow">Source</span> on GitHub</span></a>
+    <p class="status"><a href="#changelog">v{{version}}</a><time datetime="{{release_date_iso}}">{{release_date_short}}</time><a class="ci" href="{{ci_url}}"><span class="dot {{ci_class}}"></span>Build {{ci_state}}</a></p>
   </div>
   <p class="fine">Free and open source (MPL-2.0) · Windows 10 and 11, 64-bit · Updates itself · <a href="https://github.com/maj113/MaiCord/releases">All releases</a></p>
 </header>
 
+<figure class="shot"><picture><source media="(prefers-reduced-motion: reduce)" type="image/avif" srcset="screenshots/hero.avif 1440w, screenshots/hero@2x.avif 2880w" sizes="(max-width: 960px) calc(100vw - 40px), 920px"><source media="(prefers-reduced-motion: reduce)" type="image/webp" srcset="screenshots/hero.webp 1440w, screenshots/hero@2x.webp 2880w" sizes="(max-width: 960px) calc(100vw - 40px), 920px"><source type="image/avif" srcset="screenshots/hero-live.avif"><source type="image/webp" srcset="screenshots/hero-live.webp"><img src="screenshots/hero.png" width="1440" height="900" fetchpriority="high" decoding="async" alt="MaiCord in the Aurora gradient theme, with stars and comets drifting behind a #general channel. Juniper finishes typing and posts, reactions come in and Ada replies. Around the conversation: the server list, the channel list, the header with search, server tags beside names and the member list grouped by role."></picture></figure>
+
 <div class="stats">
   <div><b>{{download_size}}</b><span>portable download</span></div>
-  <div><b>~7 MB</b><span>on disk, one EXE and one DLL</span></div>
+  <div><b>{{disk_size}}</b><span>on disk, one EXE and one DLL</span></div>
   <div><b>~60 ms</b><span>to the first frame*</span></div>
   <div><b>~0%</b><span>CPU while nothing changes</span></div>
 </div>
@@ -161,6 +185,17 @@ footer a:hover { color: var(--text); }
 <section id="why">
   <h2>Why another client?</h2>
   <p>The official desktop app is a web page running in Electron, and it carries a whole browser with it. MaiCord renders on the GPU and only redraws when something on screen changes, so it starts instantly and sits idle at near-zero CPU. It is built in freestanding C++23 with no runtime dependencies beyond the DLLs that ship with Windows.</p>
+</section>
+
+<section id="screenshots">
+  <h2>Screenshots</h2>
+  <p>Every pixel below is drawn by MaiCord's own Direct3D&nbsp;11 renderer. The people, servers and messages are made up.</p>
+  <div class="gallery">
+    <figure><picture><source type="image/avif" srcset="screenshots/dark.avif 1440w, screenshots/dark@2x.avif 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px"><source type="image/webp" srcset="screenshots/dark.webp 1440w, screenshots/dark@2x.webp 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px"><img src="screenshots/dark.png" width="1440" height="900" loading="lazy" decoding="async" alt="The same channel in the dark theme: an image with reactions, a reply, a link preview, server tags and the member list."></picture><figcaption>The dark theme.</figcaption></figure>
+    <figure><picture><source type="image/avif" srcset="screenshots/light.avif 1440w, screenshots/light@2x.avif 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px"><source type="image/webp" srcset="screenshots/light.webp 1440w, screenshots/light@2x.webp 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px"><img src="screenshots/light.png" width="1440" height="900" loading="lazy" decoding="async" alt="The same channel in the light theme."></picture><figcaption>The light theme.</figcaption></figure>
+    <figure><picture><source type="image/avif" srcset="screenshots/profile.avif 1440w, screenshots/profile@2x.avif 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px"><source type="image/webp" srcset="screenshots/profile.webp 1440w, screenshots/profile@2x.webp 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px"><img src="screenshots/profile.png" width="1440" height="900" loading="lazy" decoding="async" alt="A profile popout over the channel, showing a banner, bio, server tag, role and a game activity card with artwork and elapsed time."></picture><figcaption>Profiles with roles and rich presence.</figcaption></figure>
+    <figure><picture><source type="image/avif" srcset="screenshots/settings.avif 1440w, screenshots/settings@2x.avif 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px"><source type="image/webp" srcset="screenshots/settings.webp 1440w, screenshots/settings@2x.webp 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px"><img src="screenshots/settings.png" width="1440" height="900" loading="lazy" decoding="async" alt="The Appearance page of MaiCord's settings, with theme and colour-theme choices."></picture><figcaption>Appearance settings.</figcaption></figure>
+  </div>
 </section>
 
 <section id="features">
