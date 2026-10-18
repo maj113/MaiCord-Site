@@ -43,10 +43,10 @@ def wrap(draw, text, face, width):
     return lines + [line]
 
 
-def logo(draw, x, y, size):
+def logo(draw, x, y, size, radius=53):
     """The app tile: a rounded square with the M stroke, from favicon.svg."""
     unit = size / 176
-    draw.rounded_rectangle((x, y, x + size, y + size), radius=53 * unit, fill=ACCENT)
+    draw.rounded_rectangle((x, y, x + size, y + size), radius=radius * unit, fill=ACCENT)
     points = [(x + px * unit, y + py * unit)
               for px, py in ((49.3, 125), (49.3, 54.6), (88, 96.8), (126.7, 54.6), (126.7, 125))]
     stroke = 25 * unit
@@ -97,5 +97,16 @@ def render(details, path):
     card = palette(card)
     data = io.BytesIO()
     card.save(data, "PNG", optimize=True)
+    with open(path, "wb") as f:
+        f.write(oxipng.optimize_from_memory(data.getvalue(), level=6))
+
+
+def touch_icon(path, size=180):
+    """apple-touch-icon.png: the logo full-bleed, since iOS rounds the corners itself."""
+    image = Image.new("RGB", (size * SCALE, size * SCALE), ACCENT)
+    logo(ImageDraw.Draw(image), 0, 0, size * SCALE, radius=0)
+    icon = palette(image.resize((size, size), Image.Resampling.BOX))
+    data = io.BytesIO()
+    icon.save(data, "PNG", optimize=True)
     with open(path, "wb") as f:
         f.write(oxipng.optimize_from_memory(data.getvalue(), level=6))

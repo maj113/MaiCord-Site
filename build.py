@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Builds the site: copies site/ to the output directory, fills the
-{{placeholders}} in index.html with live data from the MaiCord repository
-(latest release, its download, CI status and recent changelogs) and draws the
-link preview card (og.png) with the same release details.
+{{placeholders}} in index.html and sitemap.xml with live data from the MaiCord
+repository (latest release, its download and size on disk, CI status and
+recent changelogs) and draws the link preview card (og.png) and the
+apple-touch-icon.
 
 The output is deterministic for the same data, so the deploy workflow can
 skip a deploy when nothing changed.
@@ -15,12 +16,14 @@ GITHUB_TOKEN, when set, raises the API rate limit; public data needs none.
 import argparse
 import datetime
 import html
+import io
 import json
 import os
 import re
 import shutil
 import sys
 import urllib.request
+import zipfile
 
 import card
 
@@ -31,6 +34,7 @@ CHANGELOG_RELEASES = 3
 # long commit list and the per-release download boilerplate.
 SKIPPED_SECTIONS = {"other", "download"}
 ROOT = os.path.dirname(os.path.abspath(__file__))
+TEMPLATES = ("index.html", "sitemap.xml")
 
 
 def get(path):
@@ -44,6 +48,51 @@ def get(path):
         request.add_header("Authorization", "Bearer " + token)
     with urllib.request.urlopen(request, timeout=30) as response:
         return json.load(response)
+
+
+class RemoteFile(io.RawIOBase):
+    """A release asset read through HTTP range requests, so listing the
+    archive fetches its central directory (a few KB), not the whole zip."""
+
+    def __init__(self, url, size):
+        self.url, self.size, self.position = url, size, 0
+
+    def readable(self):
+        return True
+
+    def seekable(self):
+        return True
+
+    def tell(self):
+        return self.position
+
+    def seek(self, offset, whence=io.SEEK_SET):
+        self.position = (offset, self.position + offset, self.size + offset)[whence]
+        return self.position
+
+    def readinto(self, buffer):
+        end = min(self.position + len(buffer), self.size)
+        if end <= self.position:
+            return 0
+        request = urllib.request.Request(self.url, headers={
+            "User-Agent": "maicord-site-build", "Range": f"bytes={self.position}-{end - 1}"})
+        with urllib.request.urlopen(request, timeout=30) as response:
+            if response.status != 206:
+                raise OSError("the asset host ignored the range request")
+            data = response.read()
+        buffer[:len(data)] = data
+        self.position += len(data)
+        return len(data)
+
+
+def disk_size(archive):
+    """Bytes the extracted client takes: the archive's EXE and DLLs, or every
+    file when it holds neither. The API gives only the zip's own size, so the
+    sizes come from the zip's directory."""
+    with zipfile.ZipFile(RemoteFile(archive["browser_download_url"], archive["size"])) as z:
+        files = [i for i in z.infolist() if not i.is_dir()]
+    binaries = [i.file_size for i in files if i.filename.lower().endswith((".exe", ".dll"))]
+    return sum(binaries) if binaries else sum(i.file_size for i in files)
 
 
 def date_text(stamp):
@@ -154,6 +203,7 @@ def build(out):
         "release_date_short": short_date(latest["published_at"]),
         "download_url": html.escape(archive["browser_download_url"]),
         "download_size": size_text(archive["size"]),
+        "disk_size": size_text(disk_size(archive)),
         "ci_state": "passing" if passing else "failing",
         "ci_class": "ok" if passing else "bad",
         # The workflow page, not the run: the page then changes only when the
@@ -165,14 +215,16 @@ def build(out):
     if os.path.exists(out):
         shutil.rmtree(out)
     shutil.copytree(os.path.join(ROOT, "site"), out)
-    page = os.path.join(out, "index.html")
-    with open(page, encoding="utf-8") as f:
-        text = f.read()
-    text = re.sub(r"\{\{(\w+)\}\}", lambda m: values[m[1]], text)
-    with open(page, "w", encoding="utf-8", newline="\n") as f:
-        f.write(text)
+    for name in TEMPLATES:
+        page = os.path.join(out, name)
+        with open(page, encoding="utf-8") as f:
+            text = f.read()
+        text = re.sub(r"\{\{(\w+)\}\}", lambda m: values[m[1]], text)
+        with open(page, "w", encoding="utf-8", newline="\n") as f:
+            f.write(text)
     card.render(f"v{latest['tag_name'].lstrip('v')} · {values['release_date_short']} · "
                 f"{values['download_size']} download · No Electron", os.path.join(out, "og.png"))
+    card.touch_icon(os.path.join(out, "apple-touch-icon.png"))
     print(f"Built {out}: {values['version']} ({values['release_date']}), CI {values['ci_state']}")
 
 
