@@ -42,6 +42,8 @@
     {"@type": "ImageObject", "url": "https://maicord.com/screenshots/dark.avif", "width": 1440, "height": 900, "caption": "A server channel in the dark theme"},
     {"@type": "ImageObject", "url": "https://maicord.com/screenshots/light.avif", "width": 1440, "height": 900, "caption": "The light theme"},
     {"@type": "ImageObject", "url": "https://maicord.com/screenshots/profile.avif", "width": 1440, "height": 900, "caption": "A profile popout with a game activity"},
+    {"@type": "ImageObject", "url": "https://maicord.com/screenshots/commands.avif", "width": 1440, "height": 900, "caption": "The slash command picker"},
+    {"@type": "ImageObject", "url": "https://maicord.com/screenshots/bot.avif", "width": 1440, "height": 900, "caption": "A bot's reply with link buttons in the Sunset theme"},
     {"@type": "ImageObject", "url": "https://maicord.com/screenshots/settings.avif", "width": 1440, "height": 900, "caption": "Appearance settings"}
   ],
   "license": "https://www.mozilla.org/en-US/MPL/2.0/",
@@ -92,10 +94,14 @@ h1 { font-size: clamp(34px, 6vw, 52px); line-height: 1.1; letter-spacing: -0.02e
 .secondary:hover { border-color: var(--muted); }
 .fine { color: var(--muted); font-size: 14px; margin: 16px 0 0; }
 .narrow { display: none; }
-.shot { margin: 0 0 56px; }
-.shot img, .gallery img { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); }
+.shot { width: min(1120px, calc(100vw - 40px)); margin: 0 0 56px 50%; transform: translateX(-50%); }
+/* Shots are 1440x900 DIPs of a window with 8 DIP corners, so the radius scales with the picture. */
+.shot img, .gallery img { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: .5556% / .8889%; background: var(--surface); box-shadow: var(--window-shadow); }
+.shot img { --window-shadow: 0 2px 8px rgb(0 0 0 / .2), 0 24px 64px rgb(0 0 0 / .35); }
+.gallery img { --window-shadow: 0 1px 4px rgb(0 0 0 / .15), 0 8px 24px rgb(0 0 0 / .2); }
 .gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px 16px; }
 .gallery figure { margin: 0; }
+.gallery a { display: block; }
 .gallery figcaption { color: var(--muted); font-size: 14px; margin-top: 10px; }
 .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; margin: 0 0 80px; }
 .stats div { background: var(--surface); padding: 20px; box-shadow: 0 0 0 1px var(--line); }
@@ -207,11 +213,11 @@ footer a:hover { color: var(--text); }
   <p class="fine">Free and open source (MPL-2.0) · Windows 10 and 11, 64-bit · Updates itself · <a href="https://github.com/maj113/MaiCord/releases">All releases</a></p>
 </header>
 
-<figure class="shot"><picture><source media="(prefers-reduced-motion: reduce)" srcset="screenshots/hero.avif 1440w, screenshots/hero@2x.avif 2880w" sizes="(max-width: 960px) calc(100vw - 40px), 920px"><img src="screenshots/hero-live.avif" width="1440" height="900" fetchpriority="high" decoding="async" alt="MaiCord in the Aurora gradient theme, with stars and comets drifting behind a #general channel. Juniper finishes typing and posts, reactions come in and Ada replies. Around the conversation: the server list, the channel list, the header with search, server tags beside names and the member list grouped by role."></picture></figure>
+<figure class="shot"><picture><source media="(prefers-reduced-motion: reduce)" srcset="screenshots/hero.avif 1440w, screenshots/hero@2x.avif 2880w" sizes="min(1120px, calc(100vw - 40px))"><img src="screenshots/hero-live.avif" width="1440" height="900" fetchpriority="high" decoding="async" alt="MaiCord in the Aurora gradient theme, with stars and comets drifting behind a #general channel. Juniper finishes typing and posts, reactions come in and Ada replies. Mai types a slash, the command picker opens above the composer, and a bot answers /release with a release card and link buttons. Around the conversation: the server list, the channel list, the header with search, server tags beside names and the member list grouped by role."></picture></figure>
 
 <div class="stats">
   <div><b>{{download_size}}</b><span>portable download</span></div>
-  <div><b>{{disk_size}}</b><span>on disk, one EXE and one DLL</span></div>
+  <div><b>{{disk_size}}</b><span>on disk, one EXE and its fonts</span></div>
   <div><b>~60 ms</b><span>to the first frame*</span></div>
   <div><b>~0%</b><span>CPU while nothing changes</span></div>
 </div>
@@ -225,10 +231,12 @@ footer a:hover { color: var(--text); }
   <h2>Screenshots</h2>
   <p>Every pixel below is drawn by MaiCord's own Direct3D&nbsp;11 renderer. The people, servers and messages are made up.</p>
   <div class="gallery">
-    <figure><img src="screenshots/dark.avif" srcset="screenshots/dark.avif 1440w, screenshots/dark@2x.avif 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px" width="1440" height="900" loading="lazy" decoding="async" alt="The same channel in the dark theme: an image with reactions, a reply, a link preview, server tags and the member list."><figcaption>The dark theme.</figcaption></figure>
-    <figure><img src="screenshots/light.avif" srcset="screenshots/light.avif 1440w, screenshots/light@2x.avif 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px" width="1440" height="900" loading="lazy" decoding="async" alt="The same channel in the light theme."><figcaption>The light theme.</figcaption></figure>
-    <figure><img src="screenshots/profile.avif" srcset="screenshots/profile.avif 1440w, screenshots/profile@2x.avif 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px" width="1440" height="900" loading="lazy" decoding="async" alt="A profile popout over the channel, showing a banner, bio, server tag, role and a game activity card with artwork and elapsed time."><figcaption>Profiles with roles and rich presence.</figcaption></figure>
-    <figure><img src="screenshots/settings.avif" srcset="screenshots/settings.avif 1440w, screenshots/settings@2x.avif 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px" width="1440" height="900" loading="lazy" decoding="async" alt="The Appearance page of MaiCord's settings, with theme and colour-theme choices."><figcaption>Appearance settings.</figcaption></figure>
+    <figure><a href="screenshots/dark@2x.avif"><img src="screenshots/dark.avif" srcset="screenshots/dark.avif 1440w, screenshots/dark@2x.avif 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px" width="1440" height="900" loading="lazy" decoding="async" alt="The same channel in the dark theme: an image with reactions, a reply, a link preview, server tags and the member list."></a><figcaption>The dark theme.</figcaption></figure>
+    <figure><a href="screenshots/light@2x.avif"><img src="screenshots/light.avif" srcset="screenshots/light.avif 1440w, screenshots/light@2x.avif 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px" width="1440" height="900" loading="lazy" decoding="async" alt="The same channel in the light theme."></a><figcaption>The light theme.</figcaption></figure>
+    <figure><a href="screenshots/commands@2x.avif"><img src="screenshots/commands.avif" srcset="screenshots/commands.avif 1440w, screenshots/commands@2x.avif 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px" width="1440" height="900" loading="lazy" decoding="async" alt="The slash command picker open above the composer: a rail of apps, then a bot's commands and the built-in ones with their descriptions."></a><figcaption>Slash commands from your apps and the built-in ones.</figcaption></figure>
+    <figure><a href="screenshots/bot@2x.avif"><img src="screenshots/bot.avif" srcset="screenshots/bot.avif 1440w, screenshots/bot@2x.avif 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px" width="1440" height="900" loading="lazy" decoding="async" alt="A bot's reply to /release in the Sunset theme, with a release card and link buttons under the command attribution."></a><figcaption>App replies with buttons, in the Sunset theme.</figcaption></figure>
+    <figure><a href="screenshots/profile@2x.avif"><img src="screenshots/profile.avif" srcset="screenshots/profile.avif 1440w, screenshots/profile@2x.avif 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px" width="1440" height="900" loading="lazy" decoding="async" alt="A profile popout over the channel, showing a banner, bio, server tag, role and a game activity card with artwork and elapsed time."></a><figcaption>Profiles with roles and rich presence.</figcaption></figure>
+    <figure><a href="screenshots/settings@2x.avif"><img src="screenshots/settings.avif" srcset="screenshots/settings.avif 1440w, screenshots/settings@2x.avif 2880w" sizes="(max-width: 760px) calc(100vw - 40px), (max-width: 960px) calc(50vw - 28px), 452px" width="1440" height="900" loading="lazy" decoding="async" alt="The Appearance page of MaiCord's settings, with theme and colour-theme choices."></a><figcaption>Appearance settings.</figcaption></figure>
   </div>
 </section>
 
@@ -240,7 +248,8 @@ footer a:hover { color: var(--text); }
       <li>Markdown, code highlighting and ANSI colors</li>
       <li>Embeds, galleries, stickers and custom emoji</li>
       <li>Replies, forwards, pins, reactions, threads, forums and polls</li>
-      <li>Voice messages, GIF picker and file drag and drop</li>
+      <li>Slash commands, app buttons, select menus and modals</li>
+      <li>Voice messages, an emoji, GIF and sticker picker, and file drag and drop</li>
       <li>Search filters, mentions inbox and a Ctrl+K quick switcher</li>
     </ul></div>
     <div class="card"><h3>Voice and video</h3><ul>
@@ -283,7 +292,7 @@ footer a:hover { color: var(--text); }
     <li>Extract it anywhere, for example <code>%LOCALAPPDATA%\Programs\MaiCord</code>.</li>
     <li>Run <code>MaiCord.exe</code>. No installer or admin rights are needed.</li>
   </ol>
-  <p>Requires Windows 10 or 11 (64-bit), a CPU with AVX and a GPU with Direct3D 11 support.</p>
+  <p>Requires Windows 10 or 11 (64-bit), a CPU with AVX and AES-NI, and a GPU with Direct3D 11 support.</p>
 </section>
 
 <section id="changelog">

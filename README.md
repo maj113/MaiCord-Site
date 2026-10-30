@@ -24,7 +24,8 @@ directory, read with HTTP range requests. The finished site goes to `_site/`. Pr
 `site/screenshots/` holds renderer captures from MaiCord's opt-in showcase
 probe (`tests/integration/showcase_probe.cpp`) with invented data, as AVIF at
 1x and 2x. The hero is an animated AVIF loop (`hero-live`) whose first frame is
-the still shown for reduced motion.
+the still shown for reduced motion. Shots are 1440x900 DIPs of a window with
+8 DIP corners, so the page scales the corner radius with the picture.
 
 `.github/workflows/pages.yml` builds and deploys on every push to `master` and
 checks hourly for new releases or CI results, deploying only when the page
