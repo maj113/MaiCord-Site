@@ -274,6 +274,8 @@ def css():
              f":root, :root[data-theme=aurora] {{ {declarations('aurora')} }}",
              f"@media (prefers-color-scheme: light) {{ :root:not([data-theme]) {{ {declarations('aurora-light')} }} }}"]
     lines += [f":root[data-theme={n}] {{ {declarations(n)} }}" for n in THEMES if n != "aurora"]
+    lines += [f":root {{ --cur: {swatch('aurora')}; }}",
+              f"@media (prefers-color-scheme: light) {{ :root {{ --cur: {swatch('aurora-light')}; }} }}"]
     lines += [f"[data-theme={n}] {{ --cur: {swatch(n)}; }}" for n in THEMES]
     return "\n".join(lines)
 
