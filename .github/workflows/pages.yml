@@ -42,16 +42,21 @@ jobs:
         run: '"$RUNNER_TEMP/venv/bin/python" build.py --out _site'
 
       # Pushes and manual runs always deploy; a scheduled run deploys only
-      # when the page differs from the live one (or the live one is unreachable).
+      # when the home page or a catalog listing differs from the live one (or
+      # the live one is unreachable). A listing carries the catalog sequence,
+      # so a new catalog index always changes it.
       - name: Compare with the live site
         id: compare
         env:
           EVENT: ${{ github.event_name }}
         run: |
           changed=true
-          if [ "$EVENT" = schedule ] && curl -fsS --max-time 20 https://maicord.com/ -o "$RUNNER_TEMP/live.html" &&
-             cmp -s "$RUNNER_TEMP/live.html" _site/index.html; then
+          if [ "$EVENT" = schedule ]; then
             changed=false
+            for page in index.html plugins/index.html themes/index.html effects/index.html; do
+              curl -fsS --max-time 20 "https://maicord.com/$page" -o "$RUNNER_TEMP/live.html" &&
+                cmp -s "$RUNNER_TEMP/live.html" "_site/$page" || changed=true
+            done
           fi
           echo "changed=$changed" >> "$GITHUB_OUTPUT"
           echo "Deploy: $changed"
