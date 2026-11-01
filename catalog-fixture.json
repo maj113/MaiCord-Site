@@ -632,87 +632,88 @@
   },
   {
    "kind": "effect",
-   "slug": "matrix-rain",
-   "name": "Matrix rain",
-   "summary": "Falling green glyphs behind the interface. This is a sample entry that exists only to lay out the page.",
+   "slug": "ascii-rain",
+   "name": "ASCII rain",
+   "summary": "Columns of glyphs falling down the window, a bright head with a fading trail.",
    "authors": [
     {
-     "name": "Example Author",
-     "github": "example-author"
+     "name": "MaiCord"
     }
    ],
-   "license": "CC-BY-NC-SA-4.0",
-   "source": "https://github.com/maj113/MaiCord-plugins/tree/master/effects/matrix-rain",
+   "license": "MPL-2.0",
+   "source": "https://github.com/maj113/MaiCord/tree/master/samples/effects/ascii-rain",
    "categories": [
     "retro",
     "text"
    ],
-   "derived_from": {
-    "url": "https://example.com/original-rain",
-    "author": "Original Author",
-    "license": "CC-BY-NC-SA-4.0"
-   },
    "details": {
-    "sha256": "e0349c5b5becf736008f98b143558998693be056af84a009c10daad956fc09d2",
-    "bytes": 200
+    "sha256": "d94b09e90ac8fd5e28e373f94fa9cf19e064f1e16f2e6181c8f711118bfc1dbc",
+    "bytes": 336
    },
    "previews": [
     {
-     "sha256": "392a99e79e1fe5e6720b7131f054d167134c8e653f55c991ccbb6b768f249c8a",
-     "bytes": 91111,
-     "width": 960,
-     "height": 540,
-     "alt": "A placeholder frame of the Matrix rain effect."
+     "sha256": "b62e84a1272683816d8bf7af0ba66247df69488a646f4e2c67ff1939dd6745a5",
+     "bytes": 82208,
+     "width": 480,
+     "height": 270,
+     "alt": "ASCII rain over the default dark theme."
     }
    ],
    "loop": {
-    "sha256": "b87b645f8a077d2ab13bd0fe5c70094ea21efb8b83cb8913c26b6b6ae9f38971",
-    "bytes": 800000,
-    "width": 320,
-    "height": 180,
-    "fps": 15,
-    "seconds": 3
+    "sha256": "e140f91e927ec9df4ef3c34d8ef275da61deb2853a5e24fc11c743e039a1346d",
+    "bytes": 636893,
+    "width": 480,
+    "height": 270,
+    "fps": 10,
+    "seconds": 2.4
    },
    "version": "1.0.0",
-   "released": 1793016000,
+   "released": 1793534400,
    "file": {
-    "sha256": "586d9ab257b60dd2cdb7715dc800781728041d81d76b249d4126b7dd1743ee64",
-    "bytes": 22016
+    "sha256": "adb1985efcd2b3f70af35184bb1abae03d15e32e87cf2e3ebfc1f3aedb0f05b8",
+    "bytes": 2627
    },
-   "cost": "medium",
+   "cost": "light",
    "blend": "screen",
    "uses": [
-    "glyphs",
-    "noise"
+    "glyphs"
    ],
    "knobs": [
     {
-     "id": "density",
+     "id": "cell",
      "type": "float",
-     "label": "Column density",
+     "label": "Glyph size (DIPs)",
+     "min": 8.0,
+     "max": 32.0,
+     "default": 14.0
+    },
+    {
+     "id": "speed",
+     "type": "float",
+     "label": "Fall speed",
      "min": 0.2,
-     "max": 1,
-     "default": 0.6
+     "max": 3.0,
+     "default": 1.0
     },
     {
      "id": "trail",
-     "type": "int",
-     "label": "Trail length",
-     "min": 4,
-     "max": 40,
-     "default": 18
+     "type": "float",
+     "label": "Trail length (glyphs)",
+     "min": 4.0,
+     "max": 40.0,
+     "default": 18.0
+    },
+    {
+     "id": "mirror",
+     "type": "toggle",
+     "label": "Mirrored glyphs",
+     "default": true
     },
     {
      "id": "tint",
      "type": "color",
-     "label": "Glyph colour",
-     "default": "#33ff66"
-    },
-    {
-     "id": "head",
-     "type": "toggle",
-     "label": "Bright head",
-     "default": true
+     "label": "Colour",
+     "default": "#26FF66"
     }
    ]
   },
@@ -720,153 +721,238 @@
    "kind": "effect",
    "slug": "aurora",
    "name": "Aurora",
-   "summary": "Slow ribbons of northern light. This is a sample entry that exists only to lay out the page.",
+   "summary": "Soft curtains of light drifting across the top of the window, tinted by the theme's accent and positive roles over its background.",
    "authors": [
     {
-     "name": "Example Author",
-     "github": "example-author"
+     "name": "MaiCord"
     }
    ],
-   "license": "MIT",
-   "source": "https://github.com/maj113/MaiCord-plugins/tree/master/effects/aurora",
+   "license": "MPL-2.0",
+   "source": "https://github.com/maj113/MaiCord/tree/master/samples/effects/aurora",
    "categories": [
     "ambient",
     "nature"
    ],
    "details": {
-    "sha256": "70d085138825451f51aa7076293721febebdd320288b0cda4f9f01697558afae",
-    "bytes": 115
+    "sha256": "582593011ece86fcf3b59ca5a2abe9d0c18f802367049163122b651996bc2279",
+    "bytes": 254
    },
    "previews": [
     {
-     "sha256": "41deecf2e614303804f17e3dc39a1e5ed54261287e432320e15c755d188cd866",
-     "bytes": 44161,
-     "width": 960,
-     "height": 540,
-     "alt": "A placeholder frame of the Aurora effect."
+     "sha256": "c98761d5636b1a6f01862883d52db8d3e9e5bc34615daaab4ca14ac1ce702d00",
+     "bytes": 14327,
+     "width": 480,
+     "height": 270,
+     "alt": "Aurora over the default dark theme."
     }
    ],
    "loop": {
-    "sha256": "70f2850b8adb19b2434e4fb01829428994da0596d345212d41bf1fa267274c5c",
-    "bytes": 241795,
-    "width": 320,
-    "height": 180,
-    "fps": 15,
-    "seconds": 3
+    "sha256": "da03cabb84202c97b3d0521f975f8a5ee906d8a5d3a3e581f5d8b058f9f0f7c5",
+    "bytes": 41935,
+    "width": 480,
+    "height": 270,
+    "fps": 20,
+    "seconds": 2.4
    },
    "version": "1.0.0",
-   "released": 1791979200,
+   "released": 1793534400,
    "file": {
-    "sha256": "c220cd308a6af57d03b2fc932e9f3cd61b278ce33de1fca3775ee4784af8c09b",
-    "bytes": 15360
+    "sha256": "ab2ffcc4a60d477351d808039467b8d45b132ba1f3742dc918cc3c804ac5ffd8",
+    "bytes": 2227
    },
    "cost": "light",
-   "blend": "screen",
+   "blend": "normal",
    "uses": [
-    "noise"
+    "blue_noise"
    ],
    "knobs": [
     {
-     "id": "bands",
-     "type": "int",
-     "label": "Ribbons",
-     "min": 2,
-     "max": 6,
-     "default": 3
-    },
-    {
-     "id": "sway",
+     "id": "speed",
      "type": "float",
-     "label": "Sway",
-     "min": 0,
-     "max": 2,
-     "default": 1
+     "label": "Drift speed",
+     "min": 0.0,
+     "max": 2.0,
+     "default": 0.35
     },
     {
-     "id": "palette",
-     "type": "choice",
-     "label": "Palette",
-     "choices": [
-      "Polar",
-      "Magenta",
-      "Forest"
-     ],
-     "default": 0
+     "id": "strength",
+     "type": "float",
+     "label": "Brightness",
+     "min": 0.2,
+     "max": 1.0,
+     "default": 0.7
+    },
+    {
+     "id": "height",
+     "type": "float",
+     "label": "Reach (share of the window)",
+     "min": 0.3,
+     "max": 1.0,
+     "default": 0.75
+    },
+    {
+     "id": "curtains",
+     "type": "int",
+     "label": "Curtains",
+     "min": 1,
+     "max": 4,
+     "default": 3
     }
    ]
   },
   {
    "kind": "effect",
-   "slug": "starfield",
-   "name": "Starfield",
-   "summary": "Stars streaming past, from calm to warp speed. This is a sample entry that exists only to lay out the page.",
+   "slug": "bokeh",
+   "name": "Soft bokeh",
+   "summary": "Out-of-focus discs drifting slowly upward in three depth layers, in the theme's accent and text colours.",
    "authors": [
     {
-     "name": "Example Author",
-     "github": "example-author"
+     "name": "MaiCord"
     }
    ],
-   "license": "MIT",
-   "source": "https://github.com/maj113/MaiCord-plugins/tree/master/effects/starfield",
+   "license": "MPL-2.0",
+   "source": "https://github.com/maj113/MaiCord/tree/master/samples/effects/bokeh",
    "categories": [
-    "space",
-    "ambient"
+    "ambient",
+    "soft"
    ],
    "details": {
-    "sha256": "12aa02ba07316a3cb304d78860a1c55072ebb30098cbf737367dd9b71a88f967",
-    "bytes": 130
+    "sha256": "7348d3f6e41858d867b4716ddf1640e27faabca71f25db5634e0c6d5d694560b",
+    "bytes": 263
    },
    "previews": [
     {
-     "sha256": "8b0cb89a08c29af68933f1bc17bef69a2bbdc579ee7f92cab2feaa7942942f99",
-     "bytes": 91111,
-     "width": 960,
-     "height": 540,
-     "alt": "A placeholder frame of the Starfield effect."
+     "sha256": "8c23df884adb03f1d017ddc4b858f44ea1af4dd008192ac3636fbf2864cc6569",
+     "bytes": 25121,
+     "width": 480,
+     "height": 270,
+     "alt": "Soft bokeh over the default dark theme."
     }
    ],
    "loop": {
-    "sha256": "1367406826654a34d9ecc08424b070c034cb2be8f29556afe261a312a327aeb1",
-    "bytes": 800000,
-    "width": 320,
-    "height": 180,
-    "fps": 15,
-    "seconds": 3
+    "sha256": "5c9c9283f519e90b7c68ec45d7d0a72f7c9b61b2f8af9ab4f5925b420201e122",
+    "bytes": 539656,
+    "width": 480,
+    "height": 270,
+    "fps": 20,
+    "seconds": 2.4
    },
    "version": "1.0.0",
-   "released": 1791460800,
+   "released": 1793534400,
    "file": {
-    "sha256": "1732ad747e8e7b946e580f1d41562735a6437e49175b71e03a40a895afc4dac7",
-    "bytes": 17408
+    "sha256": "9a4f2453cbe218f54e2148d9b012e396131b1ab52a9c1f65e333f3703aaf18d8",
+    "bytes": 2264
    },
    "cost": "light",
-   "blend": "add",
+   "blend": "screen",
+   "uses": [],
+   "knobs": [
+    {
+     "id": "density",
+     "type": "float",
+     "label": "Density",
+     "min": 0.1,
+     "max": 0.9,
+     "default": 0.42
+    },
+    {
+     "id": "speed",
+     "type": "float",
+     "label": "Drift speed",
+     "min": 0.0,
+     "max": 2.0,
+     "default": 0.5
+    },
+    {
+     "id": "size",
+     "type": "float",
+     "label": "Disc size",
+     "min": 0.5,
+     "max": 2.0,
+     "default": 1.0
+    },
+    {
+     "id": "glow",
+     "type": "float",
+     "label": "Brightness",
+     "min": 0.2,
+     "max": 1.5,
+     "default": 0.8
+    }
+   ]
+  },
+  {
+   "kind": "effect",
+   "slug": "film-grain",
+   "name": "Film grain",
+   "summary": "A faint, constantly changing speckle over everything, light and dark, for a printed-paper feel.",
+   "authors": [
+    {
+     "name": "MaiCord"
+    }
+   ],
+   "license": "MPL-2.0",
+   "source": "https://github.com/maj113/MaiCord/tree/master/samples/effects/film-grain",
+   "categories": [
+    "texture",
+    "retro"
+   ],
+   "details": {
+    "sha256": "dbfb7c38a03a7dad7f1c1591688af9da7183c87439526342ab19e39c5e40381a",
+    "bytes": 226
+   },
+   "previews": [
+    {
+     "sha256": "1bd5739a7db8d9cc7f7cc13046f26ddabed3dc91c025778ba9092050e7d62f2d",
+     "bytes": 99077,
+     "width": 480,
+     "height": 270,
+     "alt": "Film grain over the default dark theme."
+    }
+   ],
+   "loop": {
+    "sha256": "045999d3a3876101acba3a5d9a8d6b28281b65ccaa77d3d14d7e3d25c8198b25",
+    "bytes": 493008,
+    "width": 480,
+    "height": 270,
+    "fps": 10,
+    "seconds": 2.4
+   },
+   "version": "1.0.0",
+   "released": 1793534400,
+   "file": {
+    "sha256": "2b6f1bfaebf688d1a71c1fe9bf3f56d0200aef5063cf1e41f3e07df5e882a60e",
+    "bytes": 1301
+   },
+   "cost": "light",
+   "blend": "normal",
    "uses": [
-    "noise",
-    "blue_noise"
+    "noise"
    ],
    "knobs": [
     {
-     "id": "layers",
-     "type": "int",
-     "label": "Depth layers",
-     "min": 1,
-     "max": 5,
-     "default": 3
-    },
-    {
-     "id": "warp",
-     "type": "toggle",
-     "label": "Warp speed",
-     "default": false
-    },
-    {
-     "id": "twinkle",
+     "id": "amount",
      "type": "float",
-     "label": "Twinkle",
-     "min": 0,
-     "max": 1,
-     "default": 0.5
+     "label": "Amount",
+     "min": 0.02,
+     "max": 0.4,
+     "default": 0.1
+    },
+    {
+     "id": "size",
+     "type": "float",
+     "label": "Grain size (DIPs)",
+     "min": 0.5,
+     "max": 4.0,
+     "default": 1.0
+    },
+    {
+     "id": "rate",
+     "type": "float",
+     "label": "Changes per second",
+     "min": 1.0,
+     "max": 30.0,
+     "default": 12.0
     }
    ]
   },
@@ -874,76 +960,244 @@
    "kind": "effect",
    "slug": "plasma",
    "name": "Plasma",
-   "summary": "Rolling, swirling colour fields. This is a sample entry that exists only to lay out the page.",
+   "summary": "The classic sum of sines, tinted toward the theme so it never fights the UI.",
    "authors": [
     {
-     "name": "Example Author",
-     "github": "example-author"
+     "name": "MaiCord"
     }
    ],
-   "license": "MIT",
-   "source": "https://github.com/maj113/MaiCord-plugins/tree/master/effects/plasma",
+   "license": "MPL-2.0",
+   "source": "https://github.com/maj113/MaiCord/tree/master/samples/effects/plasma",
    "categories": [
     "abstract",
     "retro"
    ],
    "details": {
-    "sha256": "12ecec804ee109b27ceb78b157f0795b3df335cdef038b1922b789de9e2fca06",
-    "bytes": 185
+    "sha256": "ac2b7120ad5893cbe5e11fa114920b2796a3b23745188e599c39665cf0a43295",
+    "bytes": 157
    },
    "previews": [
     {
-     "sha256": "5990595d654989942e8998c33537ffd3c8a27ad380566f8bd1406c476a49b1a6",
-     "bytes": 91111,
-     "width": 960,
-     "height": 540,
-     "alt": "A placeholder frame of the Plasma effect."
+     "sha256": "38bae74cf751a84b496301a591dfef98a9ad7902619dcd186fabf9fb7c45752f",
+     "bytes": 17075,
+     "width": 480,
+     "height": 270,
+     "alt": "Plasma over the default dark theme."
     }
    ],
    "loop": {
-    "sha256": "02817103b7e98194dbbb6c7289957821da7e0c30e21d3eda4185f3d69b17872d",
-    "bytes": 800000,
-    "width": 320,
-    "height": 180,
-    "fps": 15,
-    "seconds": 3
+    "sha256": "9ccda4a3001cdb5ea64e92815b927717e6058e7f630ed30d6c218cfcbcd026b8",
+    "bytes": 197996,
+    "width": 480,
+    "height": 270,
+    "fps": 20,
+    "seconds": 2.4
    },
    "version": "1.0.0",
-   "released": 1790337600,
+   "released": 1793534400,
    "file": {
-    "sha256": "dc4d571fb7074072d5afffb184d4378a961388f3aaf59ae458a8673e5e021025",
-    "bytes": 13312
+    "sha256": "3aead7b2ad9e90ea429de92e381c6b73ed746fef68b159bf93bc5964b51bf179",
+    "bytes": 1530
    },
-   "cost": "heavy",
-   "blend": "add",
-   "uses": [],
+   "cost": "light",
+   "blend": "normal",
+   "uses": [
+    "blue_noise"
+   ],
    "knobs": [
+    {
+     "id": "speed",
+     "type": "float",
+     "label": "Speed",
+     "min": 0.0,
+     "max": 3.0,
+     "default": 0.8
+    },
     {
      "id": "scale",
      "type": "float",
      "label": "Scale",
      "min": 0.5,
-     "max": 4,
-     "default": 1.5
+     "max": 4.0,
+     "default": 1.6
     },
     {
-     "id": "hue",
+     "id": "mix",
      "type": "float",
-     "label": "Hue",
-     "min": 0,
-     "max": 1,
-     "default": 0.6
+     "label": "Colour strength",
+     "min": 0.05,
+     "max": 1.0,
+     "default": 0.5
     },
     {
-     "id": "style",
-     "type": "choice",
-     "label": "Style",
-     "choices": [
-      "Soft",
-      "Sharp",
-      "Marbled"
-     ],
-     "default": 0
+     "id": "swirl",
+     "type": "float",
+     "label": "Swirl",
+     "min": 0.0,
+     "max": 2.0,
+     "default": 0.6
+    }
+   ]
+  },
+  {
+   "kind": "effect",
+   "slug": "starfield",
+   "name": "Starfield",
+   "summary": "Three parallax layers of twinkling stars drifting sideways, sized in DIPs so they look the same at every DPI and resolution.",
+   "authors": [
+    {
+     "name": "MaiCord"
+    }
+   ],
+   "license": "MPL-2.0",
+   "source": "https://github.com/maj113/MaiCord/tree/master/samples/effects/starfield",
+   "categories": [
+    "space",
+    "ambient"
+   ],
+   "details": {
+    "sha256": "81a290f590ba23309d333e7f2a09ad82f0e3f925e6f018a58c0e47a4ce8e071f",
+    "bytes": 273
+   },
+   "previews": [
+    {
+     "sha256": "080b0653749c9dee3d47b455523e7118e3442201689138e8fcf701e1769918a9",
+     "bytes": 15997,
+     "width": 480,
+     "height": 270,
+     "alt": "Starfield over the default dark theme."
+    }
+   ],
+   "loop": {
+    "sha256": "56dd6019ec61a4b8c4e1f8fbfae00e969d5ecc9fd1754cdaca0095cac78d4373",
+    "bytes": 327107,
+    "width": 480,
+    "height": 270,
+    "fps": 20,
+    "seconds": 2.4
+   },
+   "version": "1.0.0",
+   "released": 1793534400,
+   "file": {
+    "sha256": "b978508c399e318aecf215e03b099e6ee9d84081ed71fc37b068cb1ed6a14b88",
+    "bytes": 2166
+   },
+   "cost": "light",
+   "blend": "add",
+   "uses": [],
+   "knobs": [
+    {
+     "id": "density",
+     "type": "float",
+     "label": "Density",
+     "min": 0.02,
+     "max": 0.5,
+     "default": 0.14
+    },
+    {
+     "id": "speed",
+     "type": "float",
+     "label": "Drift speed",
+     "min": 0.0,
+     "max": 3.0,
+     "default": 0.5
+    },
+    {
+     "id": "size",
+     "type": "float",
+     "label": "Star size",
+     "min": 0.5,
+     "max": 3.0,
+     "default": 1.2
+    },
+    {
+     "id": "twinkle",
+     "type": "float",
+     "label": "Twinkle",
+     "min": 0.0,
+     "max": 1.0,
+     "default": 0.6
+    }
+   ]
+  },
+  {
+   "kind": "effect",
+   "slug": "wave-lines",
+   "name": "Wave lines",
+   "summary": "A stack of thin horizontal lines rippling with a few overlaid sines, fading from the theme's accent to its positive colour down the window.",
+   "authors": [
+    {
+     "name": "MaiCord"
+    }
+   ],
+   "license": "MPL-2.0",
+   "source": "https://github.com/maj113/MaiCord/tree/master/samples/effects/wave-lines",
+   "categories": [
+    "abstract",
+    "minimal"
+   ],
+   "details": {
+    "sha256": "b54cec542ba7adf37e84151400e90bec2ff561d727aa5f605b3db14c9f82372b",
+    "bytes": 263
+   },
+   "previews": [
+    {
+     "sha256": "fb9de290619af0f20b5ea512e7558f7c2a3bb29ec4647f755fd64a4dac326979",
+     "bytes": 35367,
+     "width": 480,
+     "height": 270,
+     "alt": "Wave lines over the default dark theme."
+    }
+   ],
+   "loop": {
+    "sha256": "dd7de2a593988e93e84c7d1971b25b1364c5951e437ccd0f6a6e7b813a268f2e",
+    "bytes": 375730,
+    "width": 480,
+    "height": 270,
+    "fps": 10,
+    "seconds": 2.4
+   },
+   "version": "1.0.0",
+   "released": 1793534400,
+   "file": {
+    "sha256": "016d923bf12949016aa24f3ef99a6be275845a83b0054ebdaeea58ff63384566",
+    "bytes": 2107
+   },
+   "cost": "light",
+   "blend": "screen",
+   "uses": [],
+   "knobs": [
+    {
+     "id": "lines",
+     "type": "int",
+     "label": "Lines",
+     "min": 4,
+     "max": 16,
+     "default": 11
+    },
+    {
+     "id": "speed",
+     "type": "float",
+     "label": "Speed",
+     "min": 0.0,
+     "max": 2.0,
+     "default": 0.45
+    },
+    {
+     "id": "amplitude",
+     "type": "float",
+     "label": "Wave height",
+     "min": 0.0,
+     "max": 1.0,
+     "default": 0.55
+    },
+    {
+     "id": "thickness",
+     "type": "float",
+     "label": "Line width (DIPs)",
+     "min": 0.5,
+     "max": 3.0,
+     "default": 1.1
     }
    ]
   }

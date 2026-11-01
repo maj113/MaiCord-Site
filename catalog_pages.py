@@ -184,8 +184,8 @@ class Site:
             for kind, info in KINDS.items())
         picker = "".join(f'<button type="button" role="menuitemradio" tabindex="-1" data-theme="{key}">{name}</button>'
                          for key, name in THEMES)
-        banner = "" if self.live else ('<p class="sample" role="note">Sample data: these entries only exist to lay out the '
-                                       'catalog pages. None of them is a real plugin, theme or effect.</p>')
+        banner = "" if self.live else ('<p class="sample" role="note">Sample catalog for reviewing the layout: nothing here is '
+                                       'published yet, and entries named "Sample" are made up.</p>')
         robots = "" if self.live else '<meta name="robots" content="noindex">\n'
         image = image or SITE + "og.png"
         return f"""<!doctype html>
@@ -386,8 +386,7 @@ def detail(site, item):
                 tag = (f'<picture><source media="(prefers-reduced-motion: reduce)" srcset="{name}"><img src="{item["loop_name"]}" '
                        f'width="{loop["width"]}" height="{loop["height"]}" alt="{esc(image["alt"])}" decoding="async" '
                        f'fetchpriority="high"></picture>')
-                caption = (f'<figcaption>A {loop["seconds"]}-second loop at {loop["fps"]} frames per second, '
-                           f'rendered in software.</figcaption>')
+                caption = f'<figcaption>A {loop["seconds"]:g}-second loop at {loop["fps"]} frames per second.</figcaption>'
             figures.append(f"<figure>{tag}{caption}</figure>")
         previews = f'<div class="preview">{"".join(figures)}</div>'
 

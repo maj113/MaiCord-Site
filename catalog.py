@@ -209,7 +209,9 @@ def _image(raw, where, limit, loop):
     image = {"sha256": node.text("sha256", 64, SHA256), "bytes": node.integer("bytes", 1, limit),
              "width": node.integer("width", 1, 4096), "height": node.integer("height", 1, 4096)}
     if loop:
-        image["fps"], image["seconds"] = node.integer("fps", 1, 60), node.integer("seconds", 1, 10)
+        image["fps"], image["seconds"] = node.integer("fps", 1, 60), node.real("seconds")
+        if not 0 < image["seconds"] <= 10:
+            node.fail("seconds", "expected a number above 0 and at most 10")
     else:
         image["alt"] = node.text("alt", 255)
     node.finish()

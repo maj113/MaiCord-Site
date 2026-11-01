@@ -31,8 +31,10 @@ size it lists.
 Fixture builds mark every page `noindex` and show a "Sample data" banner. Fixture
 previews that have no file under `catalog-fixture/previews/` get a generated
 placeholder (a UI mock-up in the theme's swatches, or colour blobs for an
-effect). The real previews in the fixture are the six themes from
-`maj113/MaiCord-plugins` and a sample loop for the Aurora effect.
+effect). The real entries in the fixture are the six themes from
+`maj113/MaiCord-plugins` and the seven effects from `samples/effects` in the MaiCord
+repository (their previews converted to PNG and APNG; the file digest is that of the
+`.hlsl`, since no `.mcfx` package exists yet). Everything named "Sample" is made up.
 
 ## What the pages read
 
@@ -84,7 +86,7 @@ placeholders) and `effect?` (an effect slug, linked both ways).
 Effects also have `cost` (`light`, `medium`, `heavy`), `blend` (`normal`,
 `screen`, `add`), `uses[]` (`noise`, `glyphs`, `blue_noise`, `pointer`,
 `texture0`, `texture1`), `knobs[]` and `loop?` (`{sha256, bytes <= 2 MiB, width,
-height, fps, seconds}`, an APNG shown on the detail page, with the first preview
+height, fps, seconds (a number, at most 10)}`, an APNG shown on the detail page, with the first preview
 as the still for reduced motion).
 
 A knob is `{id, type, label}` plus, by type: `float` and `int` have `min`, `max`
