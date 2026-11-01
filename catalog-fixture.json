@@ -1,0 +1,951 @@
+{
+ "format": 2,
+ "sequence": 1,
+ "issued": 1793361600,
+ "expires": 1795953600,
+ "items": [
+  {
+   "kind": "plugin",
+   "slug": "clear-urls",
+   "name": "Clear URLs",
+   "summary": "Removes tracking parameters from links you send.",
+   "authors": [
+    {
+     "name": "Maj Soklič",
+     "github": "maj113"
+    }
+   ],
+   "license": "MPL-2.0",
+   "source": "https://github.com/maj113/MaiCord/tree/master/samples/plugins/clear-urls",
+   "categories": [
+    "privacy",
+    "chat"
+   ],
+   "details": {
+    "sha256": "a5e8c02e1e7cfcf871933c21f394dffe2f9d357eee15dea2edc7f464257b4f05",
+    "bytes": 387
+   },
+   "previews": [],
+   "versions": [
+    {
+     "version": "1.0.0",
+     "released": 1792843200,
+     "changelog": null,
+     "api_level": 6,
+     "permissions": [
+      "message_send"
+     ],
+     "network": [],
+     "file": {
+      "sha256": "028445e9414653aaeeb81e21151efa712470f775b6db06584970b2a83f34d2a0",
+      "bytes": 3584
+     }
+    }
+   ]
+  },
+  {
+   "kind": "plugin",
+   "slug": "sample-quote-cards",
+   "name": "Sample Quote Cards",
+   "summary": "Shows replies to long messages as compact quote cards. This is a sample entry that exists only to lay out the page.",
+   "authors": [
+    {
+     "name": "Example Author",
+     "github": "example-author"
+    }
+   ],
+   "license": "MIT",
+   "source": "https://github.com/maj113/MaiCord-plugins/tree/master/plugins/sample-quote-cards",
+   "categories": [
+    "chat",
+    "appearance"
+   ],
+   "details": {
+    "sha256": "5de78362c03494eb76d7dc3445a23c7180a65a5402542cf490f52e4e4a3174e1",
+    "bytes": 226
+   },
+   "previews": [
+    {
+     "sha256": "3a6f61db611f42a2fb7b07e983aff6ec132028e105e4f9283d8876e72c3cd5f9",
+     "bytes": 91111,
+     "width": 1440,
+     "height": 900,
+     "alt": "A placeholder showing a reply with a quote card."
+    }
+   ],
+   "versions": [
+    {
+     "version": "0.3.0",
+     "released": 1792411200,
+     "changelog": "Rounded corners on the card.",
+     "api_level": 6,
+     "permissions": [
+      "message_render",
+      "read_messages"
+     ],
+     "network": [],
+     "file": {
+      "sha256": "62b8c6baf1b027adae975022a7183b4d060a474bac05696de468f958022fba31",
+      "bytes": 6144
+     }
+    }
+   ]
+  },
+  {
+   "kind": "plugin",
+   "slug": "sample-voice-timer",
+   "name": "Sample Voice Timer",
+   "summary": "Shows how long you have been in a voice channel, and nudges you on the hour. This is a sample entry that exists only to lay out the page.",
+   "authors": [
+    {
+     "name": "Example Author",
+     "github": "example-author"
+    }
+   ],
+   "license": "MIT",
+   "source": "https://github.com/maj113/MaiCord-plugins/tree/master/plugins/sample-voice-timer",
+   "categories": [
+    "voice",
+    "utility"
+   ],
+   "details": {
+    "sha256": "9a9d1a66c5bb288d1c298bcb0ab6663f0b571eb7e386bdbfb7a25b16ceb9531a",
+    "bytes": 221
+   },
+   "previews": [],
+   "versions": [
+    {
+     "version": "1.1.0",
+     "released": 1790942400,
+     "changelog": "Hourly nudges are optional now.",
+     "api_level": 6,
+     "permissions": [
+      "read_voice",
+      "read_context",
+      "notify",
+      "timer",
+      "settings"
+     ],
+     "network": [],
+     "file": {
+      "sha256": "c2573fa3653bb9e13aeb2c3442cdf3728c8dd520d8472e302fadb13712db97d4",
+      "bytes": 5632
+     }
+    },
+    {
+     "version": "1.0.0",
+     "released": 1789214400,
+     "changelog": "First release.",
+     "api_level": 6,
+     "permissions": [
+      "read_voice",
+      "read_context",
+      "notify",
+      "timer",
+      "settings"
+     ],
+     "network": [],
+     "file": {
+      "sha256": "dde8a511d41bb5e7dca9037ffd27aa771110dc8ce61ab21bf4c17f501cba1fca",
+      "bytes": 5120
+     }
+    }
+   ]
+  },
+  {
+   "kind": "plugin",
+   "slug": "sample-link-previews",
+   "name": "Sample Link Previews",
+   "summary": "Adds previews for links that Discord does not unfurl itself. This is a sample entry that exists only to lay out the page.",
+   "authors": [
+    {
+     "name": "Example Author",
+     "github": "example-author"
+    }
+   ],
+   "license": "Apache-2.0",
+   "source": "https://github.com/maj113/MaiCord-plugins/tree/master/plugins/sample-link-previews",
+   "categories": [
+    "chat",
+    "utility"
+   ],
+   "details": {
+    "sha256": "591bb198546ed90c0cd7036d1e772345fe0d33cb9c584dac9f103d1c86096e26",
+    "bytes": 336
+   },
+   "previews": [
+    {
+     "sha256": "69d9641e8c44b678b8c01d4b075637fbe4aff5ade5ace707f62bf5baecb07b38",
+     "bytes": 91111,
+     "width": 1440,
+     "height": 900,
+     "alt": "A placeholder showing a link preview under a message."
+    },
+    {
+     "sha256": "d60bf1c266dc1bed1daf439d0119f1cf198e2cae604c62e83e3e831b31316ebb",
+     "bytes": 92222,
+     "width": 1440,
+     "height": 900,
+     "alt": "A placeholder showing the plugin's settings page."
+    }
+   ],
+   "versions": [
+    {
+     "version": "1.2.0",
+     "released": 1793188800,
+     "changelog": "Previews are cached for a day.",
+     "api_level": 6,
+     "permissions": [
+      "read_messages",
+      "message_render",
+      "network",
+      "open_links",
+      "store",
+      "ui_slots"
+     ],
+     "network": [
+      "api.example.com",
+      "cdn.example.com"
+     ],
+     "file": {
+      "sha256": "8059942bbed0d539b938dcef4c3dade60e684aab649c3cc5f6e3a0168e6e1018",
+      "bytes": 9216
+     }
+    },
+    {
+     "version": "1.1.0",
+     "released": 1791547200,
+     "changelog": "Added the open-in-browser button.",
+     "api_level": 6,
+     "permissions": [
+      "read_messages",
+      "message_render",
+      "network",
+      "open_links",
+      "store",
+      "ui_slots"
+     ],
+     "network": [
+      "api.example.com",
+      "cdn.example.com"
+     ],
+     "file": {
+      "sha256": "fbeba7689e66f97997bdb4624b7d688ca60a76b7964a95c96121ff695ec4d0f3",
+      "bytes": 8704
+     }
+    }
+   ]
+  },
+  {
+   "kind": "plugin",
+   "slug": "sample-auto-status",
+   "name": "Sample Auto Status",
+   "summary": "Rotates your custom status through a list you write. This is a sample entry that exists only to lay out the page.",
+   "authors": [
+    {
+     "name": "Example Author",
+     "github": "example-author"
+    }
+   ],
+   "license": "GPL-3.0-only",
+   "source": "https://github.com/maj113/MaiCord-plugins/tree/master/plugins/sample-auto-status",
+   "categories": [
+    "fun"
+   ],
+   "details": {
+    "sha256": "ab8cfe43c23d9b1b61fc864e69e5b20f963c388f2d66dcb3ee9f71904623fa9a",
+    "bytes": 122
+   },
+   "previews": [],
+   "versions": [
+    {
+     "version": "0.9.1",
+     "released": 1790769600,
+     "changelog": null,
+     "api_level": 6,
+     "permissions": [
+      "act_presence",
+      "timer",
+      "store",
+      "settings"
+     ],
+     "network": [],
+     "file": {
+      "sha256": "12a315611cdd18dff0d66dfdc203b8e974ad47497e16d9f1f9997bff0c9acd00",
+      "bytes": 4608
+     }
+    }
+   ]
+  },
+  {
+   "kind": "plugin",
+   "slug": "sample-key-launcher",
+   "name": "Sample Key Launcher",
+   "summary": "Opens channels and profiles from keyboard shortcuts you choose. This is a sample entry that exists only to lay out the page.",
+   "authors": [
+    {
+     "name": "Example Author",
+     "github": "example-author"
+    }
+   ],
+   "license": "MIT",
+   "source": "https://github.com/maj113/MaiCord-plugins/tree/master/plugins/sample-key-launcher",
+   "categories": [
+    "accessibility",
+    "utility"
+   ],
+   "details": {
+    "sha256": "847493b740b03b68b224dc429635af255c3172abbb2313f65ad4a39a15e6be50",
+    "bytes": 191
+   },
+   "previews": [],
+   "versions": [
+    {
+     "version": "1.0.2",
+     "released": 1792065600,
+     "changelog": "Fixed a shortcut clash with Ctrl+K.",
+     "api_level": 6,
+     "permissions": [
+      "keybinds",
+      "commands",
+      "navigate",
+      "menus"
+     ],
+     "network": [],
+     "file": {
+      "sha256": "9c85f1f2c043bbd4d193ea221c6d566100ea61af6e6f94ecb4649b5479cf68d6",
+      "bytes": 5376
+     }
+    }
+   ]
+  },
+  {
+   "kind": "theme",
+   "slug": "deep-ocean",
+   "name": "Deep Ocean",
+   "summary": "A deep navy dark theme with a cool teal accent.",
+   "authors": [
+    {
+     "name": "MaiCord"
+    }
+   ],
+   "license": "CC0-1.0",
+   "source": "https://github.com/maj113/MaiCord-plugins/tree/b76ad03b224c41d6b9338e769370aded6a3a5d01/themes/deep-ocean",
+   "categories": [
+    "blue",
+    "cool"
+   ],
+   "details": {
+    "sha256": "57ca1e6f8c268018c1f272af7228ba91cd06f0ad098177db1d2438171fc0a41b",
+    "bytes": 333
+   },
+   "previews": [
+    {
+     "sha256": "429bf0b6c82a403f3909b583837cf2010e6cdd539efb8c631cb2b240d9c778d2",
+     "bytes": 224637,
+     "width": 1440,
+     "height": 900,
+     "alt": "Deep Ocean in the main chat view."
+    }
+   ],
+   "version": "1.0.0",
+   "released": 1793564156,
+   "file": {
+    "sha256": "c5fe6009f17611e51b1b281c6439322cb81a45d782ee6d3221bcd581446c4dfe",
+    "bytes": 1211
+   },
+   "base": "dark",
+   "swatches": {
+    "background": "#0b1a29",
+    "surface": "#10253a",
+    "text": "#e4f1f8",
+    "accent": "#22b8cf"
+   }
+  },
+  {
+   "kind": "theme",
+   "slug": "warm-paper",
+   "name": "Warm Paper",
+   "summary": "A warm, cream-coloured light theme with a terracotta accent, easy on the eyes.",
+   "authors": [
+    {
+     "name": "MaiCord"
+    }
+   ],
+   "license": "CC0-1.0",
+   "source": "https://github.com/maj113/MaiCord-plugins/tree/b76ad03b224c41d6b9338e769370aded6a3a5d01/themes/warm-paper",
+   "categories": [
+    "warm",
+    "cream"
+   ],
+   "details": {
+    "sha256": "0aa17e4bda58720a54c1c501ee4a918c5ca2586468635bd7b124bbd659c005c0",
+    "bytes": 306
+   },
+   "previews": [
+    {
+     "sha256": "e4a97cd56c371ecd9ab524ebf9bcb77097342a117c1b7becf45678cbcc8c0241",
+     "bytes": 221204,
+     "width": 1440,
+     "height": 900,
+     "alt": "Warm Paper in the main chat view."
+    }
+   ],
+   "version": "1.0.0",
+   "released": 1793564156,
+   "file": {
+    "sha256": "1de87b6dbc346aa9039acef94724191010a6aaad0a89194fd5ca186c967221da",
+    "bytes": 1347
+   },
+   "base": "light",
+   "swatches": {
+    "background": "#f7f0e1",
+    "surface": "#fdf8ec",
+    "text": "#2b2118",
+    "accent": "#b04a24"
+   }
+  },
+  {
+   "kind": "theme",
+   "slug": "high-contrast",
+   "name": "High Contrast",
+   "summary": "Pure black and white with a yellow accent, strong borders and heavier icons. Passes WCAG AAA for text.",
+   "authors": [
+    {
+     "name": "MaiCord"
+    }
+   ],
+   "license": "CC0-1.0",
+   "source": "https://github.com/maj113/MaiCord-plugins/tree/b76ad03b224c41d6b9338e769370aded6a3a5d01/themes/high-contrast",
+   "categories": [
+    "accessibility"
+   ],
+   "details": {
+    "sha256": "c882f9f86d98ea65a6882b6f0ccbe5872b1fcfd51dc59fb6e9432ab6938e4e60",
+    "bytes": 416
+   },
+   "previews": [
+    {
+     "sha256": "ccb844638e2dfcea33a1a68fab9ed33004336e77516e1cfacbd8407814812c87",
+     "bytes": 220721,
+     "width": 1440,
+     "height": 900,
+     "alt": "High Contrast in the main chat view."
+    }
+   ],
+   "version": "1.0.0",
+   "released": 1793564156,
+   "file": {
+    "sha256": "f375629e52774d5401605aff0e44f168c7c21bfef33cd346874f3a92fd952b27",
+    "bytes": 1652
+   },
+   "base": "dark",
+   "swatches": {
+    "background": "#000000",
+    "surface": "#161616",
+    "text": "#ffffff",
+    "accent": "#ffd23f"
+   }
+  },
+  {
+   "kind": "theme",
+   "slug": "fjord",
+   "name": "Fjord",
+   "summary": "A muted, frosty blue-grey dark theme in the spirit of the Nord palette.",
+   "authors": [
+    {
+     "name": "MaiCord"
+    }
+   ],
+   "license": "MIT",
+   "source": "https://github.com/maj113/MaiCord-plugins/tree/b76ad03b224c41d6b9338e769370aded6a3a5d01/themes/fjord",
+   "categories": [
+    "muted",
+    "cool"
+   ],
+   "derived_from": {
+    "url": "https://www.nordtheme.com",
+    "author": "Sven Greb",
+    "license": "MIT"
+   },
+   "details": {
+    "sha256": "04286fc6a1f48b987be345c0c4336d9f356828f868d70d12aeb74ef448964476",
+    "bytes": 274
+   },
+   "previews": [
+    {
+     "sha256": "b5800f26df7e34131295ba2ca64a77ad8a50e8eb18a594abe90381b9fe86487f",
+     "bytes": 221729,
+     "width": 1440,
+     "height": 900,
+     "alt": "Fjord in the main chat view."
+    }
+   ],
+   "version": "1.0.0",
+   "released": 1793564156,
+   "file": {
+    "sha256": "6b9fc6edb272c9338ce1269073e6912cf054a622082e6c925b86fc95f2cb650a",
+    "bytes": 1313
+   },
+   "base": "dark",
+   "swatches": {
+    "background": "#2e3440",
+    "surface": "#363d4b",
+    "text": "#e5e9f0",
+    "accent": "#88c0d0"
+   }
+  },
+  {
+   "kind": "theme",
+   "slug": "rose-dusk",
+   "name": "Rose Dusk",
+   "summary": "Deep plum surfaces with a soft rose accent, like the sky just after sunset.",
+   "authors": [
+    {
+     "name": "MaiCord"
+    }
+   ],
+   "license": "CC0-1.0",
+   "source": "https://github.com/maj113/MaiCord-plugins/tree/b76ad03b224c41d6b9338e769370aded6a3a5d01/themes/rose-dusk",
+   "categories": [
+    "warm",
+    "purple"
+   ],
+   "details": {
+    "sha256": "e51d100347aeb78437f0d6e8a870693f41914406e9462ab8b6b702a2270b9be7",
+    "bytes": 219
+   },
+   "previews": [
+    {
+     "sha256": "71eb1908781d58c313e2bcaf36469a52ceb274bbf2be32e604edfa5aa8afff47",
+     "bytes": 224459,
+     "width": 1440,
+     "height": 900,
+     "alt": "Rose Dusk in the main chat view."
+    }
+   ],
+   "version": "1.0.0",
+   "released": 1793564156,
+   "file": {
+    "sha256": "df88c9d0f8d529bb9167b60d156b265124f291af2844e8a3324bd79cf43617bf",
+    "bytes": 1210
+   },
+   "base": "dark",
+   "swatches": {
+    "background": "#241540",
+    "surface": "#321f4d",
+    "text": "#f6ecf8",
+    "accent": "#f08fb8"
+   }
+  },
+  {
+   "kind": "theme",
+   "slug": "obsidian",
+   "name": "Obsidian",
+   "summary": "True black chat and surfaces for OLED panels, with neutral greys and an emerald accent.",
+   "authors": [
+    {
+     "name": "MaiCord"
+    }
+   ],
+   "license": "CC0-1.0",
+   "source": "https://github.com/maj113/MaiCord-plugins/tree/b76ad03b224c41d6b9338e769370aded6a3a5d01/themes/obsidian",
+   "categories": [
+    "oled"
+   ],
+   "details": {
+    "sha256": "8b62d70cdc955052d4a50b68ab282c865a894e2185e929eb00df854437fbbaaf",
+    "bytes": 354
+   },
+   "previews": [
+    {
+     "sha256": "55397c10d7f75cfd960c59643ed03b7a65f425d40ff86d33822352f0920e1ff4",
+     "bytes": 222664,
+     "width": 1440,
+     "height": 900,
+     "alt": "Obsidian in the main chat view."
+    }
+   ],
+   "version": "1.0.0",
+   "released": 1793564156,
+   "file": {
+    "sha256": "b2a700421815e9370a53a7cfdaf4aa41c558131afaac5b94bd439183fa395371",
+    "bytes": 1209
+   },
+   "base": "dark",
+   "swatches": {
+    "background": "#000000",
+    "surface": "#101011",
+    "text": "#ececee",
+    "accent": "#34d399"
+   }
+  },
+  {
+   "kind": "theme",
+   "slug": "sample-neon-grid",
+   "name": "Sample Neon Grid",
+   "summary": "Synthwave purples and hot pink, with drifting stars behind the chat. This is a sample entry that exists only to lay out the page.",
+   "authors": [
+    {
+     "name": "Example Author",
+     "github": "example-author"
+    }
+   ],
+   "license": "CC-BY-NC-SA-4.0",
+   "source": "https://github.com/maj113/MaiCord-plugins/tree/master/themes/sample-neon-grid",
+   "categories": [
+    "colorful",
+    "animated"
+   ],
+   "derived_from": {
+    "url": "https://example.com/retrowave-palette",
+    "author": "Original Author",
+    "license": "CC-BY-NC-SA-4.0"
+   },
+   "details": {
+    "sha256": "36d47aa6efd2e7bcbaddc64faa90e6e0d29e525130f1800c21bf9ee3c8a0a04a",
+    "bytes": 207
+   },
+   "previews": [
+    {
+     "sha256": "8f1c021ddc9d06eaac280ecbf64b85a3a41b63b2acbb08ab04342b6aa58947ef",
+     "bytes": 91111,
+     "width": 1440,
+     "height": 900,
+     "alt": "A placeholder showing the Neon Grid theme with stars."
+    }
+   ],
+   "version": "1.0.0",
+   "released": 1793102400,
+   "file": {
+    "sha256": "f089ca956fb615e79768e29be5b31e29c3d83e9d8789b8d71cf7ed5f4eb04811",
+    "bytes": 11000
+   },
+   "base": "dark",
+   "swatches": {
+    "background": "#0b0614",
+    "surface": "#140b24",
+    "text": "#f3e9ff",
+    "accent": "#ff3ea5"
+   },
+   "effect": "starfield"
+  },
+  {
+   "kind": "effect",
+   "slug": "matrix-rain",
+   "name": "Matrix rain",
+   "summary": "Falling green glyphs behind the interface. This is a sample entry that exists only to lay out the page.",
+   "authors": [
+    {
+     "name": "Example Author",
+     "github": "example-author"
+    }
+   ],
+   "license": "CC-BY-NC-SA-4.0",
+   "source": "https://github.com/maj113/MaiCord-plugins/tree/master/effects/matrix-rain",
+   "categories": [
+    "retro",
+    "text"
+   ],
+   "derived_from": {
+    "url": "https://example.com/original-rain",
+    "author": "Original Author",
+    "license": "CC-BY-NC-SA-4.0"
+   },
+   "details": {
+    "sha256": "e0349c5b5becf736008f98b143558998693be056af84a009c10daad956fc09d2",
+    "bytes": 200
+   },
+   "previews": [
+    {
+     "sha256": "392a99e79e1fe5e6720b7131f054d167134c8e653f55c991ccbb6b768f249c8a",
+     "bytes": 91111,
+     "width": 960,
+     "height": 540,
+     "alt": "A placeholder frame of the Matrix rain effect."
+    }
+   ],
+   "loop": {
+    "sha256": "b87b645f8a077d2ab13bd0fe5c70094ea21efb8b83cb8913c26b6b6ae9f38971",
+    "bytes": 800000,
+    "width": 320,
+    "height": 180,
+    "fps": 15,
+    "seconds": 3
+   },
+   "version": "1.0.0",
+   "released": 1793016000,
+   "file": {
+    "sha256": "586d9ab257b60dd2cdb7715dc800781728041d81d76b249d4126b7dd1743ee64",
+    "bytes": 22016
+   },
+   "cost": "medium",
+   "blend": "screen",
+   "uses": [
+    "glyphs",
+    "noise"
+   ],
+   "knobs": [
+    {
+     "id": "density",
+     "type": "float",
+     "label": "Column density",
+     "min": 0.2,
+     "max": 1,
+     "default": 0.6
+    },
+    {
+     "id": "trail",
+     "type": "int",
+     "label": "Trail length",
+     "min": 4,
+     "max": 40,
+     "default": 18
+    },
+    {
+     "id": "tint",
+     "type": "color",
+     "label": "Glyph colour",
+     "default": "#33ff66"
+    },
+    {
+     "id": "head",
+     "type": "toggle",
+     "label": "Bright head",
+     "default": true
+    }
+   ]
+  },
+  {
+   "kind": "effect",
+   "slug": "aurora",
+   "name": "Aurora",
+   "summary": "Slow ribbons of northern light. This is a sample entry that exists only to lay out the page.",
+   "authors": [
+    {
+     "name": "Example Author",
+     "github": "example-author"
+    }
+   ],
+   "license": "MIT",
+   "source": "https://github.com/maj113/MaiCord-plugins/tree/master/effects/aurora",
+   "categories": [
+    "ambient",
+    "nature"
+   ],
+   "details": {
+    "sha256": "70d085138825451f51aa7076293721febebdd320288b0cda4f9f01697558afae",
+    "bytes": 115
+   },
+   "previews": [
+    {
+     "sha256": "41deecf2e614303804f17e3dc39a1e5ed54261287e432320e15c755d188cd866",
+     "bytes": 44161,
+     "width": 960,
+     "height": 540,
+     "alt": "A placeholder frame of the Aurora effect."
+    }
+   ],
+   "loop": {
+    "sha256": "70f2850b8adb19b2434e4fb01829428994da0596d345212d41bf1fa267274c5c",
+    "bytes": 241795,
+    "width": 320,
+    "height": 180,
+    "fps": 15,
+    "seconds": 3
+   },
+   "version": "1.0.0",
+   "released": 1791979200,
+   "file": {
+    "sha256": "c220cd308a6af57d03b2fc932e9f3cd61b278ce33de1fca3775ee4784af8c09b",
+    "bytes": 15360
+   },
+   "cost": "light",
+   "blend": "screen",
+   "uses": [
+    "noise"
+   ],
+   "knobs": [
+    {
+     "id": "bands",
+     "type": "int",
+     "label": "Ribbons",
+     "min": 2,
+     "max": 6,
+     "default": 3
+    },
+    {
+     "id": "sway",
+     "type": "float",
+     "label": "Sway",
+     "min": 0,
+     "max": 2,
+     "default": 1
+    },
+    {
+     "id": "palette",
+     "type": "choice",
+     "label": "Palette",
+     "choices": [
+      "Polar",
+      "Magenta",
+      "Forest"
+     ],
+     "default": 0
+    }
+   ]
+  },
+  {
+   "kind": "effect",
+   "slug": "starfield",
+   "name": "Starfield",
+   "summary": "Stars streaming past, from calm to warp speed. This is a sample entry that exists only to lay out the page.",
+   "authors": [
+    {
+     "name": "Example Author",
+     "github": "example-author"
+    }
+   ],
+   "license": "MIT",
+   "source": "https://github.com/maj113/MaiCord-plugins/tree/master/effects/starfield",
+   "categories": [
+    "space",
+    "ambient"
+   ],
+   "details": {
+    "sha256": "12aa02ba07316a3cb304d78860a1c55072ebb30098cbf737367dd9b71a88f967",
+    "bytes": 130
+   },
+   "previews": [
+    {
+     "sha256": "8b0cb89a08c29af68933f1bc17bef69a2bbdc579ee7f92cab2feaa7942942f99",
+     "bytes": 91111,
+     "width": 960,
+     "height": 540,
+     "alt": "A placeholder frame of the Starfield effect."
+    }
+   ],
+   "loop": {
+    "sha256": "1367406826654a34d9ecc08424b070c034cb2be8f29556afe261a312a327aeb1",
+    "bytes": 800000,
+    "width": 320,
+    "height": 180,
+    "fps": 15,
+    "seconds": 3
+   },
+   "version": "1.0.0",
+   "released": 1791460800,
+   "file": {
+    "sha256": "1732ad747e8e7b946e580f1d41562735a6437e49175b71e03a40a895afc4dac7",
+    "bytes": 17408
+   },
+   "cost": "light",
+   "blend": "add",
+   "uses": [
+    "noise",
+    "blue_noise"
+   ],
+   "knobs": [
+    {
+     "id": "layers",
+     "type": "int",
+     "label": "Depth layers",
+     "min": 1,
+     "max": 5,
+     "default": 3
+    },
+    {
+     "id": "warp",
+     "type": "toggle",
+     "label": "Warp speed",
+     "default": false
+    },
+    {
+     "id": "twinkle",
+     "type": "float",
+     "label": "Twinkle",
+     "min": 0,
+     "max": 1,
+     "default": 0.5
+    }
+   ]
+  },
+  {
+   "kind": "effect",
+   "slug": "plasma",
+   "name": "Plasma",
+   "summary": "Rolling, swirling colour fields. This is a sample entry that exists only to lay out the page.",
+   "authors": [
+    {
+     "name": "Example Author",
+     "github": "example-author"
+    }
+   ],
+   "license": "MIT",
+   "source": "https://github.com/maj113/MaiCord-plugins/tree/master/effects/plasma",
+   "categories": [
+    "abstract",
+    "retro"
+   ],
+   "details": {
+    "sha256": "12ecec804ee109b27ceb78b157f0795b3df335cdef038b1922b789de9e2fca06",
+    "bytes": 185
+   },
+   "previews": [
+    {
+     "sha256": "5990595d654989942e8998c33537ffd3c8a27ad380566f8bd1406c476a49b1a6",
+     "bytes": 91111,
+     "width": 960,
+     "height": 540,
+     "alt": "A placeholder frame of the Plasma effect."
+    }
+   ],
+   "loop": {
+    "sha256": "02817103b7e98194dbbb6c7289957821da7e0c30e21d3eda4185f3d69b17872d",
+    "bytes": 800000,
+    "width": 320,
+    "height": 180,
+    "fps": 15,
+    "seconds": 3
+   },
+   "version": "1.0.0",
+   "released": 1790337600,
+   "file": {
+    "sha256": "dc4d571fb7074072d5afffb184d4378a961388f3aaf59ae458a8673e5e021025",
+    "bytes": 13312
+   },
+   "cost": "heavy",
+   "blend": "add",
+   "uses": [],
+   "knobs": [
+    {
+     "id": "scale",
+     "type": "float",
+     "label": "Scale",
+     "min": 0.5,
+     "max": 4,
+     "default": 1.5
+    },
+    {
+     "id": "hue",
+     "type": "float",
+     "label": "Hue",
+     "min": 0,
+     "max": 1,
+     "default": 0.6
+    },
+    {
+     "id": "style",
+     "type": "choice",
+     "label": "Style",
+     "choices": [
+      "Soft",
+      "Sharp",
+      "Marbled"
+     ],
+     "default": 0
+    }
+   ]
+  }
+ ]
+}
