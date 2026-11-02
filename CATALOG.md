@@ -5,12 +5,14 @@ MaiCord's signed catalog (index format 2, the `maj113/MaiCord-plugins`
 repository). Each kind has a listing (a grid of cards with search, category
 filters and sort) and a detail page per item (description, author, version,
 license and credit, permissions or knobs, previews, an "Install in MaiCord"
-`maicord://` link with a copy button, and a source link).
+`maicord://` link with a copy button, and a source link). Plugins and effects
+also have a developer guide (`/plugins/develop`, `/effects/develop`), rendered
+from MaiCord's SDK and effect guides (README.md says how they are pinned).
 
 The pages follow the site's rules: static HTML, inline CSS, no web fonts and one
-inline script (the theme picker, the backdrop, the filters and the copy button).
-Without scripts every page still lists everything; only the search box, the
-filters and the copy button need them.
+inline script (the theme picker, the backdrop, the filters, the copy button and
+the install hint). Without scripts every page still lists everything; only the
+search box, the filters, the copy button and the hint need them.
 
 The format-2 contract is owned by the catalog tools
 (`tools/release/plugin_index.py` in the MaiCord repository and its vectors in
@@ -21,6 +23,10 @@ that contract's limits.
 
     python3 build.py                                   # catalog-fixture.json (default)
     python3 build.py --catalog live --catalog-key <130 hex digits>
+
+The deploy workflow passes `--catalog "$CATALOG"`: `fixture` until the release
+flip (README.md's checklist), then `live`, with the key from the repository
+variable `MAICORD_PLUGIN_CATALOG_PUBLIC_KEY`.
 
 `--catalog live` fetches `index.json` and `index.json.sig` from the Pages root
 `https://maj113.github.io/MaiCord-plugins/` (`--catalog-url` overrides it) and
@@ -33,13 +39,13 @@ files the index names are fetched from `details/<sha256>.md` and
 `previews/<sha256>.png` next to the index and checked against the SHA-256 and
 size it lists. The packages under `files/` are not needed to build the pages.
 
-The fixture is a real format-2 build of `maj113/MaiCord-plugins` (5 plugins, 6
+The fixture is a real format-2 build of `maj113/MaiCord-plugins` (27 plugins, 6
 themes, 7 effects), signed with a throwaway key: `catalog-fixture.json` is the
 index byte for byte, and `catalog-fixture/` holds its `index.json.sig`, the
 throwaway `public-key.txt` (the build verifies the signature under it), and the
-`details/` and `previews/` files. Fixture builds mark every page `noindex` and
-show a "Sample data" banner. Delete the fixture and the banner once the live
-catalog is published.
+`details/` and `previews/` files. Fixture builds mark every catalog page
+`noindex` and show a "Sample data" note. Delete the fixture and the note once
+the live catalog is published.
 
 ## What the pages read
 
@@ -115,13 +121,54 @@ integers); `toggle` has a boolean `default`; `color` has a `#RRGGBB` `default`;
 `choice` has `choices` (2 to 16 unique strings of at most 24 characters) and an
 index `default`. At most 16 numeric or toggle knobs, 4 colours and 8 choices.
 
+## What the build makes
+
+- **Pictures.** Each preview and loop is verified against the index's SHA-256
+  and size (`catalog.py`), checked again against the pixel size the index lists
+  (`images.py`), and only then re-encoded. Stills become AVIF (4:4:4) at 360,
+  720 and 1440 pixels wide (never wider than the original), offered through
+  `srcset` and `sizes` as the card, tile and detail column need them, with the
+  original PNG as the `<img>` fallback. An effect's APNG loop becomes an
+  animated AVIF at the first of three qualities that stays within 38 dB of
+  the PNG on three probe frames and under half its size (grain needs a high
+  one); if none does, the page keeps the PNG. Reduced motion shows the still.
+- **Link preview cards.** `og.png` in each item's directory: kind, name,
+  summary, author, version and the first preview (plugins have none, so a tile
+  with their initial). The pages' `og:image` points at it.
+- **Clean addresses.** One directory per page, linked with a trailing slash;
+  no `.html` in any link or in the sitemap. `develop` is reserved as a slug
+  (`/plugins/develop`, `/effects/develop`), and the build fails on an item
+  that uses it.
+- **404.html.** Served by GitHub Pages for any missing address, so it links
+  root-relative. It lists the three listings with their counts and, for a
+  mistyped catalog address, offers the search for it.
+- **Empty state.** A filter or search that matches nothing says what it
+  searched for and offers to clear the filters.
+- **Keyboard.** The filter chips form one tab stop per row; the arrow keys,
+  Home and End move along it. Every control has a focus ring, and the page has
+  a skip link.
+- **Install hint.** "Install in MaiCord" is a plain `maicord://` link. With
+  the script, when the page keeps the focus for three seconds after the click
+  (nothing opened, or the browser's prompt is still up), a hint says MaiCord
+  may not be installed and links to the download; the text without a script
+  stays under the button.
+- **Home page.** The home page's catalog section shows Translate, Message
+  Logger and Clear URLs, the themes and two effects with their loops
+  (`HOME_PLUGINS`, `HOME_EFFECTS` in `catalog_pages.py`), and its navigation is
+  the catalog pages' navigation. A fixture build carries the sample-data note.
+- **Sitemap.** The two developer guides always; once the live catalog is
+  published, also the three listings and every item. Fixture pages are
+  `noindex` and stay out.
+
 ## Files
 
 - `catalog.py`: loads, verifies and checks the catalog.
-- `catalog_pages.py` and `catalog-assets/`: the page renderer, its CSS and its scripts.
+- `catalog_pages.py` and `catalog-assets/`: the page renderer, its CSS (`page.css`
+  with the shared `chrome.css` and `cards.css`) and its scripts (`site.js` is shared
+  with the home page).
+- `images.py`: the AVIF variants. `card.py`: the link preview cards.
+- `guide.py`, `guides/` and `sync_guides.py`: the developer guides.
+- `check_site.py`: the link, image and sitemap check that ends every build.
 - `markup.py`: the escaped Markdown subset (also used for the release notes).
 - `p256.py`: signature verification.
 - `catalog-fixture.json` and `catalog-fixture/`: the signed sample catalog and its files.
-
-The nav links to these pages, the sitemap entries and the README mention wait
-for the home page draft.
