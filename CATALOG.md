@@ -12,12 +12,17 @@ inline script (the theme picker, the backdrop, the filters and the copy button).
 Without scripts every page still lists everything; only the search box, the
 filters and the copy button need them.
 
+The format-2 contract is owned by the catalog tools
+(`tools/release/plugin_index.py` in the MaiCord repository and its vectors in
+`tests/fixtures/plugin_index/format2/`). This site reads a subset and follows
+that contract's limits.
+
 ## Switching the source
 
     python3 build.py                                   # catalog-fixture.json (default)
     python3 build.py --catalog live --catalog-key <130 hex digits>
 
-`--catalog live` fetches `index.json` and `index.json.sig` from
+`--catalog live` fetches `index.json` and `index.json.sig` from the Pages root
 `https://maj113.github.io/MaiCord-plugins/` (`--catalog-url` overrides it) and
 verifies the P-256 signature (`p256.py`, standard library only) over
 `SHA-256("MaiCord plugin index v2\n" + document)` under the catalog public key
@@ -26,21 +31,21 @@ compiles in). A bad signature, an expired index or a missing key fails the
 build, so the hourly deploy keeps the previous site. The details and preview
 files the index names are fetched from `details/<sha256>.md` and
 `previews/<sha256>.png` next to the index and checked against the SHA-256 and
-size it lists.
+size it lists. The packages under `files/` are not needed to build the pages.
 
-Fixture builds mark every page `noindex` and show a "Sample data" banner. Fixture
-previews that have no file under `catalog-fixture/previews/` get a generated
-placeholder (a UI mock-up in the theme's swatches, or colour blobs for an
-effect). The real entries in the fixture are the six themes from
-`maj113/MaiCord-plugins` and the seven effects from `samples/effects` in the MaiCord
-repository (their previews converted to PNG and APNG; the file digest is that of the
-`.hlsl`, since no `.mcfx` package exists yet). Everything named "Sample" is made up.
+The fixture is a real format-2 build of `maj113/MaiCord-plugins` (5 plugins, 6
+themes, 7 effects), signed with a throwaway key: `catalog-fixture.json` is the
+index byte for byte, and `catalog-fixture/` holds its `index.json.sig`, the
+throwaway `public-key.txt` (the build verifies the signature under it), and the
+`details/` and `previews/` files. Fixture builds mark every page `noindex` and
+show a "Sample data" banner. Delete the fixture and the banner once the live
+catalog is published.
 
 ## What the pages read
 
 The document is untrusted: wrong types, missing members and bad values fail the
-build, unknown members are ignored with a warning (printed by the build). Text
-may not contain control characters. Sizes are the limits `catalog.py` enforces.
+build; unknown members are ignored with a warning (printed by the build). Text
+may not contain control characters. The limits are format 2's.
 
 Root:
 
@@ -50,7 +55,11 @@ Root:
 | `sequence` | integer | shown as an HTML comment so a new index changes the listings |
 | `issued`, `expires` | unix seconds | `issued < expires <= issued + 35 days`; live builds refuse an expired index |
 | `items` | array, at most 128 | |
-| `revoked`, `blocklist` | arrays of objects with `sha256` | an item whose latest file is listed is not published |
+| `revoked` | at most 64 of `{sha256, severity (malicious, broken, withdrawn), reason (0 to 128), since}` | optional; all members required, a repeated `sha256` is refused |
+| `blocklist` | at most 64 of `{sha256, reason (0 to 128), since}` | optional, same rules |
+
+An item whose latest file (`file.sha256`) is listed in `revoked` or `blocklist`
+is not published.
 
 Every item:
 
@@ -62,37 +71,48 @@ Every item:
 | `summary` | text, at most 255 | the card text and the page description |
 | `authors` | 1 to 4 of `{name (64), github? (39)}` | `github` links the name |
 | `license` | SPDX id, at most 32 | linked to spdx.org |
-| `source` | https URL, at most 256 | the "View source" button |
-| `homepage` | https URL, optional | shown as "Website" in the facts |
-| `categories` | at most 3 slugs | any vocabulary; the filter chips are the values in use |
+| `source` | https URL with a dotted host, at most 256 | the "View source" button |
+| `homepage` | same, optional | shown as "Website" in the facts |
+| `categories` | at most 3 slugs, each at most 24 characters | any vocabulary; the filter chips are the values in use |
 | `derived_from` | `{url, author, license}`, optional | "Based on the work of ..." in the credit |
 | `details` | `{sha256, bytes <= 16 KiB}` | Markdown: headings, paragraphs, `-` lists, code, `**bold**`, `` `code` ``, https links |
-| `previews` | at most 4 of `{sha256, bytes <= 256 KiB, width, height, alt (255)}` | PNG; the first is the card thumbnail. Themes and effects need at least one; alt text is required |
+| `previews` | at most 4 of `{sha256, bytes <= 256 KiB, width, height (1 to 4096), alt (255)}` | PNG; the first is the card thumbnail. Themes and effects need at least one |
 
-Plugins add `versions`, newest first, 1 to 4 of `{version (23), released, changelog? (512),
-commit? (40 hex), api_level, permissions[], network[], file {sha256, bytes <= 64 MiB}}`.
-`permissions` are the `MC_PERM_*` names in lower case plus `network`; a name the
-pages do not know is shown by its name and rated medium. `network` lists the
-hosts. The latest version drives the card and the page.
+Plugins add `versions`, newest first, 1 to 4 of `{version, released, changelog?
+(512), commit? (40 hex), api_level (1 to 65535), permissions[], network[], file
+{sha256, bytes <= 8 MiB}}`. Versions are `x.y.z` (each part 0 to 999, no leading
+zeros), strictly decreasing, with `released` not increasing. The latest version
+drives the card and the page.
 
-Themes and effects have one version, on the item itself: `version`, `released`
-(unix seconds), `changelog?` and `file {sha256, bytes}` (at most 64 KiB for a
-theme and 1.5 MiB for an effect).
+- `permissions` are the `MC_PERM_*` names in lower case, in bit order: `message_send`,
+  `read_messages`, `message_history`, `read_activity`, `network`, `composer`,
+  `act_messages`, `act_presence`, `clipboard`, `automated_actions`,
+  `persistent_log`. The list is the full effective set, and `network` is listed
+  exactly when `network[]` is not empty. The site keeps its own label and a risk level
+  (low, medium, high) for each.
+- `network[]` holds at most 8 unique hosts: exact (`api.example.com`) or a wildcard
+  (`*.example.com`), lower-case letters, digits, hyphens and dots, with at least one dot.
+
+Themes and effects have one version, on the item itself: `version` (`x.y.z`),
+`released` (unix seconds), `changelog?` and `file {sha256, bytes}` (at most 64 KiB
+for a theme and 1.5 MiB for an effect).
 
 Themes also have `base` (`dark`, `light`, `amoled`), `swatches?` (`{background,
-surface, text, accent}` as `#RRGGBB`, for the card dots, the Colours section and
-placeholders) and `effect?` (an effect slug, linked both ways).
+surface, text, accent}` as `#RRGGBB`, for the card dots and the Colours section)
+and `effect?` (an effect slug, linked both ways when the effect is listed).
 
 Effects also have `cost` (`light`, `medium`, `heavy`), `blend` (`normal`,
 `screen`, `add`), `uses[]` (`noise`, `glyphs`, `blue_noise`, `pointer`,
 `texture0`, `texture1`), `knobs[]` and `loop?` (`{sha256, bytes <= 2 MiB, width,
-height, fps, seconds (a number, at most 10)}`, an APNG shown on the detail page, with the first preview
-as the still for reduced motion).
+height, fps (1 to 60), seconds (integer, 1 to 10)}`, an APNG shown on the detail
+page, with the first preview as the still for reduced motion).
 
-A knob is `{id, type, label}` plus, by type: `float` and `int` have `min`, `max`
-and `default`; `toggle` has a boolean `default`; `color` has a `#RRGGBB`
-`default`; `choice` has `choices` (2 to 16 strings) and an index `default`. At most
-16 numeric or toggle knobs, 4 colours and 8 choices.
+A knob is `{id, type, label}`: `id` is `[a-z][a-z0-9_]*` up to 24 characters and
+`label` up to 48. By type: `float` and `int` have `min`, `max` and `default` with
+`min < max` and `min <= default <= max` (floats have at most 3 decimals, ints are
+integers); `toggle` has a boolean `default`; `color` has a `#RRGGBB` `default`;
+`choice` has `choices` (2 to 16 unique strings of at most 24 characters) and an
+index `default`. At most 16 numeric or toggle knobs, 4 colours and 8 choices.
 
 ## Files
 
@@ -100,7 +120,7 @@ and `default`; `toggle` has a boolean `default`; `color` has a `#RRGGBB`
 - `catalog_pages.py` and `catalog-assets/`: the page renderer, its CSS and its scripts.
 - `markup.py`: the escaped Markdown subset (also used for the release notes).
 - `p256.py`: signature verification.
-- `catalog-fixture.json` and `catalog-fixture/`: the sample catalog and its files.
+- `catalog-fixture.json` and `catalog-fixture/`: the signed sample catalog and its files.
 
 The nav links to these pages, the sitemap entries and the README mention wait
 for the home page draft.

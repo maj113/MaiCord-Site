@@ -6,7 +6,6 @@ filters and the copy button. CATALOG.md describes the data the pages read."""
 import datetime
 import html
 import os
-import random
 
 from markup import inline, markdown
 
@@ -34,23 +33,22 @@ KINDS = {
     },
 }
 
-# Permission names are MC_PERM_* in lower case (include/maicord/sdk/maicord_plugin.h) plus `network`.
-# The label is the consent text's gist and the level is how much the permission exposes:
-# 0 changes only the plugin's own surface, 1 reads or changes your Discord data, 2 reads your
+# Permission names are the MC_PERM_* names in lower case (include/maicord/sdk/plugin_abi.h). The catalog lists the
+# full effective set, including what hooks and buttons imply. The label is the consent text's gist and the level is
+# how much the permission exposes: 0 stays on your PC, 1 reads or changes parts of your Discord data, 2 reads your
 # messages, acts for you or reaches the network.
 PERMISSIONS = {
-    "settings": ("Adds settings pages", 0), "menus": ("Adds context menu items", 0),
-    "message_send": ("Changes your messages before they are sent", 1), "commands": ("Adds local slash commands", 0),
-    "ui_slots": ("Adds badges and buttons", 0), "store": ("Stores its own data on your PC", 0),
-    "timer": ("Runs timers", 0), "read_context": ("Sees the open channel and your account", 1),
-    "read_guilds": ("Reads servers, channels and roles", 1), "read_members": ("Reads users, members, friends and profiles", 1),
-    "read_presence": ("Reads statuses, devices and activities", 1), "read_voice": ("Sees who is in voice", 1),
-    "read_messages": ("Reads the messages you receive", 2), "message_render": ("Changes how messages look", 1),
-    "act_messages": ("Sends, edits, reacts to and marks messages read for you", 2),
-    "act_presence": ("Sets your custom status and activity", 1), "navigate": ("Opens channels, profiles and its own pages", 0),
-    "clipboard": ("Copies text to the clipboard", 0), "open_links": ("Opens links, after asking you", 0),
-    "notify": ("Shows notices and dialogs", 0), "keybinds": ("Registers keyboard shortcuts", 0),
-    "effects": ("Draws background effects", 0), "network": ("Connects to the hosts listed below", 2),
+    "message_send": ("Changes your messages before they are sent", 1),
+    "read_messages": ("Reads the messages you receive", 2),
+    "message_history": ("Keeps deleted and edited messages visible", 2),
+    "read_activity": ("Sees presence, voice, servers, members and friends", 1),
+    "network": ("Connects to the hosts listed below", 2),
+    "composer": ("Reads and changes the message box, starts replies and edits", 1),
+    "act_messages": ("Sends, edits and deletes your messages, reacts and marks read", 2),
+    "act_presence": ("Sets your custom status and activity", 1),
+    "clipboard": ("Copies text to the clipboard", 0),
+    "automated_actions": ("Acts without you clicking (not allowed in this catalog)", 2),
+    "persistent_log": ("Restores kept messages from its own log (not allowed in this catalog)", 2),
 }
 LEVELS = ("Low", "Medium", "High")
 COSTS = {"light": "Light", "medium": "Medium", "heavy": "Heavy"}
@@ -60,7 +58,6 @@ BASES = {"dark": "Dark", "light": "Light", "amoled": "AMOLED"}
 KNOB_TYPES = {"float": "Slider", "int": "Whole-number slider", "toggle": "Switch", "color": "Colour", "choice": "Choice"}
 USES = {"noise": "noise texture", "glyphs": "glyph grid", "blue_noise": "blue-noise texture",
         "pointer": "pointer position (optional)", "texture0": "bundled texture", "texture1": "second bundled texture"}
-DEFAULT_SWATCHES = {"background": "#1a1a1e", "surface": "#222225", "text": "#f2f4f7", "accent": "#5865f2"}
 THEMES = (("dark", "Dark"), ("light", "Light"), ("amoled", "AMOLED"), ("aurora", "Aurora"), ("sunset", "Sunset"),
           ("ocean", "Ocean"), ("aurora-light", "Aurora light"))
 LOGO = ('<svg class="logo" viewBox="0 0 176 176" aria-hidden="true"><rect width="176" height="176" rx="53" fill="#5865f2"/>'
@@ -107,64 +104,21 @@ def license_html(identifier):
     return f'<a href="https://spdx.org/licenses/{esc(identifier)}.html">{esc(identifier)}</a>'
 
 
-# ---- placeholder previews ----------------------------------------------------------------------
-
-def placeholder(item, image):
-    """A generated stand-in for a preview the catalog lists but does not ship (fixture builds only):
-    a UI mock-up in the theme's colours, or soft colour blobs for an effect."""
-    rng = random.Random(image["sha256"])
-    w, h = image["width"], image["height"]
-    if item["kind"] == "effect":
-        hue = rng.randrange(360)
-        blobs = "".join(
-            f'<circle cx="{rng.randrange(w)}" cy="{rng.randrange(h)}" r="{rng.randrange(h // 4, h // 2)}" '
-            f'fill="hsl({(hue + rng.randrange(-50, 50)) % 360} 80% 55%)" opacity=".6"/>' for _ in range(5))
-        body = (f'<defs><filter id="b" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="{h // 8}"/>'
-                f'</filter></defs><rect width="{w}" height="{h}" fill="hsl({hue} 50% 8%)"/><g filter="url(#b)">{blobs}</g>')
-        text = "#ffffff"
-    else:
-        c = item.get("swatches") or DEFAULT_SWATCHES
-        text, accent, surface = c["text"], c["accent"], c["surface"]
-        rows = []
-        for n in range(6):
-            y = 100 + n * 110
-            bar = rng.randrange(260, 760)
-            rows.append(f'<circle cx="372" cy="{y + 22}" r="22" fill="{accent if n % 3 == 0 else text}" opacity="{1 if n % 3 == 0 else .3}"/>'
-                        f'<rect x="414" y="{y}" width="{rng.randrange(90, 180)}" height="14" rx="7" fill="{text}" opacity=".8"/>'
-                        f'<rect x="414" y="{y + 28}" width="{bar}" height="12" rx="6" fill="{text}" opacity=".35"/>')
-        rails = "".join(f'<circle cx="36" cy="{50 + n * 64}" r="22" fill="{accent if n == 0 else text}" opacity="{1 if n == 0 else .2}"/>'
-                        for n in range(8))
-        channels = "".join(f'<rect x="96" y="{110 + n * 44}" width="{rng.randrange(80, 170)}" height="14" rx="7" fill="{text}" opacity=".3"/>'
-                           for n in range(10))
-        body = (f'<rect width="1440" height="900" fill="{c["background"]}"/><rect width="72" height="900" fill="{surface}"/>{rails}'
-                f'<rect x="72" width="228" height="900" fill="{surface}" opacity=".7"/>{channels}'
-                f'<rect x="84" y="96" width="204" height="40" rx="8" fill="{accent}" opacity=".25"/>'
-                f'<rect x="300" width="1140" height="56" fill="{surface}"/><rect x="332" y="22" width="160" height="14" rx="7" fill="{text}" opacity=".8"/>'
-                f'{"".join(rows)}<rect x="332" y="800" width="1076" height="56" rx="14" fill="{surface}"/>'
-                f'<rect x="1328" y="812" width="68" height="32" rx="8" fill="{accent}"/>')
-        w, h = 1440, 900
-    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" width="{image["width"]}" height="{image["height"]}">'
-            f'{body}<text x="{w - 28}" y="{h - 28}" text-anchor="end" font-family="Segoe UI, system-ui, sans-serif" '
-            f'font-size="{h // 34}" fill="{text}" fill-opacity=".6">Placeholder preview</text></svg>\n')
-
-
 def write_files(out, item):
-    """Writes the item's previews (the real PNG, else a placeholder SVG) and loop into its directory and
-    records their names: item["shots"] = [(name, image)], item["loop_name"]."""
+    """Writes the item's previews and loop into its directory and records their names:
+    item["shots"] = [(name, image)], item["loop_name"]."""
     directory = os.path.join(out, KINDS[item["kind"]]["path"], item["slug"])
     os.makedirs(directory, exist_ok=True)
     item["shots"], item["loop_name"] = [], None
     for n, image in enumerate(item["previews"], 1):
-        name = f"preview-{n}.png" if image["data"] is not None else f"preview-{n}.svg"
-        with open(os.path.join(directory, name), "wb" if image["data"] is not None else "w",
-                  **({} if image["data"] is not None else {"encoding": "utf-8", "newline": "\n"})) as f:
-            f.write(image["data"] if image["data"] is not None else placeholder(item, image))
+        name = f"preview-{n}.png"
+        with open(os.path.join(directory, name), "wb") as f:
+            f.write(image["data"])
         item["shots"].append((name, image))
-    loop = item.get("loop")
-    if loop and loop["data"] is not None:
+    if item.get("loop"):
         item["loop_name"] = "loop.png"
         with open(os.path.join(directory, "loop.png"), "wb") as f:
-            f.write(loop["data"])
+            f.write(item["loop"]["data"])
 
 
 # ---- page shell --------------------------------------------------------------------------------
@@ -184,8 +138,8 @@ class Site:
             for kind, info in KINDS.items())
         picker = "".join(f'<button type="button" role="menuitemradio" tabindex="-1" data-theme="{key}">{name}</button>'
                          for key, name in THEMES)
-        banner = "" if self.live else ('<p class="sample" role="note">Sample catalog for reviewing the layout: nothing here is '
-                                       'published yet, and entries named "Sample" are made up.</p>')
+        banner = ('' if self.live else '<p class="sample" role="note">Sample data: a test catalog signed with a throwaway key, '
+                  'not published yet.</p>')
         robots = "" if self.live else '<meta name="robots" content="noindex">\n'
         image = image or SITE + "og.png"
         return f"""<!doctype html>
@@ -313,7 +267,7 @@ def listing(site, kind):
         stamp = (f'Catalog issued {date_text(site.catalog["issued"])}. Items are listed from MaiCord\'s signed catalog; '
                  'MaiCord checks the signature again before it installs anything.')
     else:
-        stamp = "Sample catalog for reviewing the layout."
+        stamp = "Sample build: this catalog is signed with a throwaway key and is not published yet."
     body = f"""<header>
 <h1>{info["title"]}</h1>
 <p class="lead">{info["lead"]}</p>
@@ -468,7 +422,7 @@ def detail(site, item):
 </div>
 </div>"""
     image = None
-    if item["shots"] and item["shots"][0][1]["data"] is not None:
+    if item["shots"]:
         image = f'{SITE}{info["path"]}/{slug}/{item["shots"][0][0]}'
     return site.shell(title=f'{item["name"]} · {info["title"]}', description=item["summary"], path=f'{info["path"]}/{slug}/',
                       depth=2, body=body, script=asset("detail.js"), image=image, current=kind)

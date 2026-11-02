@@ -60,7 +60,7 @@ def markdown(text, top=3):
             code = []
         elif heading:
             flush()
-            level = min(top + len(heading[1]) - 1, 6)
+            level = min(top + max(len(heading[1]) - 3, 0), 6)  # `###` is the first level under a page section
             out.append(f"<h{level}>{inline(heading[2])}</h{level}>")
         elif line.startswith("- "):
             if paragraph:

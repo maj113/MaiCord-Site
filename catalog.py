@@ -1,9 +1,9 @@
 """Loads and checks the catalog the plugin, theme and effect pages are built
 from: index format 2 of maj113/MaiCord-plugins. CATALOG.md describes it.
 
-Two sources, one code path after the bytes arrive:
-  fixture  catalog-fixture.json and catalog-fixture/ (sample items; previews
-           that have no file get a generated placeholder)
+Two sources, one code path after the bytes arrive, and both signed:
+  fixture  catalog-fixture.json (the index), catalog-fixture/ (its signature,
+           throwaway public key, details and previews): a real format 2 build
   live     the published index and its signature, verified against the
            catalog public key, plus the details and preview files it names
 
@@ -28,7 +28,7 @@ FIXTURE_INDEX = os.path.join(ROOT, "catalog-fixture.json")
 FIXTURE_DIR = os.path.join(ROOT, "catalog-fixture")
 LIVE_URL = "https://maj113.github.io/MaiCord-plugins/"
 # The index signature covers SHA-256(DOMAIN + document), as format 1 does with
-# its "v1" domain. [INFERENCE] the format 2 domain string is not fixed yet.
+# its "v1" domain (catalog format 2, local://prog/catalog-format2.md).
 DOMAIN = b"MaiCord plugin index v2\n"
 
 KINDS = ("plugin", "theme", "effect")
@@ -38,8 +38,8 @@ MAX_DETAILS_BYTES = 16 * 1024
 MAX_PREVIEW_BYTES = 256 * 1024
 MAX_LOOP_BYTES = 2 * 1024 * 1024
 MAX_PREVIEWS = 4
-# Package limits by kind (design 16.1): a DLL, a theme document, a .mcfx.
-FILE_LIMITS = {"plugin": 64 * 1024 * 1024, "theme": 64 * 1024, "effect": 1536 * 1024}
+# Package limits by kind: a DLL, a theme document, a .mcfx.
+FILE_LIMITS = {"plugin": 8 * 1024 * 1024, "theme": 64 * 1024, "effect": 1536 * 1024}
 MAX_VALIDITY_SECONDS = 35 * 86400
 CLOCK_SKEW_SECONDS = 600
 
@@ -51,9 +51,20 @@ BLENDS = ("normal", "screen", "add")
 BASES = ("dark", "light", "amoled")
 USES = ("noise", "glyphs", "blue_noise", "pointer", "texture0", "texture1")
 KNOB_TYPES = ("float", "int", "toggle", "color", "choice")
-# Format 1's limits for knob scalars, colours and choices (design 16.1).
+# The format 2 limits for knob scalars, colours and choices.
 KNOB_LIMITS = {"scalar": 16, "color": 4, "choice": 8}
 CHOICE_MAX = 16
+VERSION = r"(0|[1-9][0-9]{0,2})\.(0|[1-9][0-9]{0,2})\.(0|[1-9][0-9]{0,2})"
+HOST = r"(\*\.)?[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+"
+# MC_PERM_* names in bit order (include/maicord/sdk/plugin_abi.h).
+PERMISSIONS = ("message_send", "read_messages", "message_history", "read_activity", "network", "composer",
+               "act_messages", "act_presence", "clipboard", "automated_actions", "persistent_log")
+SEVERITIES = ("malicious", "broken", "withdrawn")
+
+
+def version_key(text):
+    return tuple(int(part) for part in text.split("."))
+
 
 # Unknown members and permission names the pages could not describe; the
 # build prints them.
@@ -95,7 +106,7 @@ class Node:
         return value
 
     def url(self, key, required=True):
-        return self.text(key, 256, r"https://[^\s\"'<>\\]+", required)
+        return self.text(key, 256, r"https://[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+(:[0-9]+)?([/?#][^\s\"'<>\\]*)?", required)
 
     def integer(self, key, low, high, required=True):
         value = self.get(key, required)
@@ -111,6 +122,13 @@ class Node:
             return None
         if type(value) not in (int, float) or abs(value) > 1e9 or value != value:
             self.fail(key, "expected a number")
+        return value
+
+    def decimal(self, key):
+        """A number with at most 3 decimals."""
+        value = self.real(key, True)
+        if round(value, 3) != value:
+            self.fail(key, "expected at most 3 decimals")
         return value
 
     def boolean(self, key, required=True):
@@ -137,14 +155,23 @@ class Node:
             self.fail(key, f"expected a list of {minimum} to {maximum} entries")
         return value
 
-    def strings(self, key, maximum, pattern, minimum=0, required=True):
+    def strings(self, key, maximum, pattern, minimum=0, required=True, maximum_text=253):
         values = self.array(key, maximum, minimum, required)
         if values is None:
             return None
         for n, value in enumerate(values):
-            Node({"": value}, f"{self.where}.{key}[{n}]").text("", 253, pattern)
+            Node({"": value}, f"{self.where}.{key}[{n}]").text("", maximum_text, pattern)
         if len(set(values)) != len(values):
             self.fail(key, "duplicate entries")
+        return values
+
+    def hosts(self, key, maximum):
+        """Network hosts: exact or `*.host`, lower-case LDH names, as the client accepts them."""
+        values = self.strings(key, maximum, HOST)
+        for value in values:
+            base = value[2:] if value.startswith("*.") else value
+            if len(base) > 64 or "." not in base or base.rsplit(".", 1)[1].isdigit():
+                self.fail(key, f"{value!r} is not a host name")
         return values
 
     def finish(self):
@@ -168,11 +195,11 @@ class Source:
     def __init__(self, live, url=LIVE_URL):
         self.live, self.url = live, url if url.endswith("/") else url + "/"
 
-    def read(self, name, limit, optional=False):
+    def read(self, name, limit):
         if not self.live:
-            path = FIXTURE_INDEX if name == "index.json" else os.path.join(FIXTURE_DIR, *name.split("/"))
+            path = os.path.join(FIXTURE_DIR, *name.split("/")) if name != "index.json" else FIXTURE_INDEX
             if not os.path.exists(path):
-                return self.missing(name, optional)
+                raise CatalogError(f"{name}: not found")
             with open(path, "rb") as f:
                 data = f.read(limit + 1)
         else:
@@ -181,18 +208,10 @@ class Source:
                 with urllib.request.urlopen(request, timeout=30) as response:
                     data = response.read(limit + 1)
             except urllib.error.HTTPError as error:
-                if error.code == 404:
-                    return self.missing(name, optional)
-                raise CatalogError(f"{name}: HTTP {error.code}") from error
+                raise CatalogError(f"{name}: " + ("not found" if error.code == 404 else f"HTTP {error.code}")) from error
         if len(data) > limit:
             raise CatalogError(f"{name}: larger than {limit} bytes")
         return data
-
-    @staticmethod
-    def missing(name, optional):
-        if optional:
-            return None
-        raise CatalogError(f"{name}: not found")
 
 
 def _file(node, key, limit):
@@ -209,9 +228,7 @@ def _image(raw, where, limit, loop):
     image = {"sha256": node.text("sha256", 64, SHA256), "bytes": node.integer("bytes", 1, limit),
              "width": node.integer("width", 1, 4096), "height": node.integer("height", 1, 4096)}
     if loop:
-        image["fps"], image["seconds"] = node.integer("fps", 1, 60), node.real("seconds")
-        if not 0 < image["seconds"] <= 10:
-            node.fail("seconds", "expected a number above 0 and at most 10")
+        image["fps"], image["seconds"] = node.integer("fps", 1, 60), node.integer("seconds", 1, 10)
     else:
         image["alt"] = node.text("alt", 255)
     node.finish()
@@ -227,11 +244,11 @@ def _author(raw, where):
 
 def _knob(raw, where):
     node = Node(raw, where)
-    knob = {"id": node.text("id", 32, r"[a-z][a-z0-9_]*"), "type": node.one_of("type", KNOB_TYPES),
-            "label": node.text("label", 64)}
+    knob = {"id": node.text("id", 24, r"[a-z][a-z0-9_]*"), "type": node.one_of("type", KNOB_TYPES),
+            "label": node.text("label", 48)}
     kind = knob["type"]
     if kind in ("float", "int"):
-        read = node.real if kind == "float" else (lambda key: node.integer(key, -10 ** 9, 10 ** 9))
+        read = node.decimal if kind == "float" else (lambda key: node.integer(key, -10 ** 9, 10 ** 9))
         knob["min"], knob["max"], knob["default"] = read("min"), read("max"), read("default")
         if not knob["min"] < knob["max"] or not knob["min"] <= knob["default"] <= knob["max"]:
             node.fail("default", "expected min < max and min <= default <= max")
@@ -240,7 +257,7 @@ def _knob(raw, where):
     elif kind == "color":
         knob["default"] = node.text("default", 7, COLOR)
     else:
-        knob["choices"] = node.strings("choices", CHOICE_MAX, r"[^\x00-\x1f]+", minimum=2)
+        knob["choices"] = node.strings("choices", CHOICE_MAX, r"[^\x00-\x1f]+", minimum=2, maximum_text=24)
         knob["default"] = node.integer("default", 0, len(knob["choices"]) - 1)
     node.finish()
     return knob
@@ -263,14 +280,18 @@ def _version(raw, where, kind):
     """A plugin's version record, or the data item's own members (`raw` is the
     item's node then)."""
     node = raw if isinstance(raw, Node) else Node(raw, where)
-    version = {"version": node.text("version", 23), "released": node.integer("released", 1, 2 ** 40),
+    version = {"version": node.text("version", 11, VERSION), "released": node.integer("released", 1, 2 ** 40),
                "changelog": node.text("changelog", 512, required=False),
                "file": _file(node, "file", FILE_LIMITS[kind])}
     if kind == "plugin":
         version["commit"] = node.text("commit", 40, r"[0-9a-f]{40}", required=False)
         version["api_level"] = node.integer("api_level", 1, 0xFFFF)
-        version["permissions"] = node.strings("permissions", 32, r"[a-z][a-z0-9_]*")
-        version["network"] = node.strings("network", 8, r"[a-z0-9]([a-z0-9.-]*[a-z0-9])?")
+        version["permissions"] = node.strings("permissions", len(PERMISSIONS), "|".join(PERMISSIONS))
+        if version["permissions"] != [p for p in PERMISSIONS if p in version["permissions"]]:
+            node.fail("permissions", "expected the permissions in their fixed order")
+        version["network"] = node.hosts("network", 8)
+        if ("network" in version["permissions"]) != bool(version["network"]):
+            node.fail("network", "expected hosts exactly when the network permission is listed")
         node.finish()
     return version
 
@@ -282,7 +303,7 @@ def _item(raw, where, source):
             "summary": node.text("summary", 255), "license": node.text("license", 32, r"[A-Za-z0-9.+-]+"),
             "source": node.url("source"), "homepage": node.url("homepage", required=False)}
     item["authors"] = [_author(a, f"{where}.authors[{n}]") for n, a in enumerate(node.array("authors", 4, 1))]
-    item["categories"] = node.strings("categories", 3, SLUG)
+    item["categories"] = node.strings("categories", 3, SLUG, maximum_text=24)
     derived = node.child("derived_from", required=False)
     item["derived_from"] = derived and {"url": derived.url("url"), "author": derived.text("author", 64),
                                         "license": derived.text("license", 32, r"[A-Za-z0-9.+-]+")}
@@ -295,8 +316,9 @@ def _item(raw, where, source):
     if kind == "plugin":
         versions = node.array("versions", 4, 1)
         item["versions"] = [_version(v, f"{where}.versions[{n}]", kind) for n, v in enumerate(versions)]
-        if any(a["released"] < b["released"] for a, b in zip(item["versions"], item["versions"][1:])):
-            raise CatalogError(f"{where}.versions: expected newest first")
+        for newer, older in zip(item["versions"], item["versions"][1:]):
+            if version_key(newer["version"]) <= version_key(older["version"]) or newer["released"] < older["released"]:
+                raise CatalogError(f"{where}.versions: expected newest first, versions strictly decreasing")
         latest = item["versions"][0]
     else:
         latest = _version(node, where, kind)
@@ -324,10 +346,8 @@ def _item(raw, where, source):
     item["description"] = item["description"].decode("utf-8")
     for image in item["previews"] + ([item["loop"]] if item.get("loop") else []):
         image["data"] = source.read(f"previews/{image['sha256']}.png",
-                                    MAX_LOOP_BYTES if image is item.get("loop") else MAX_PREVIEW_BYTES,
-                                    optional=not source.live)
-        if image["data"] is not None:
-            check(image["data"], image, f"{where}.previews")
+                                    MAX_LOOP_BYTES if image is item.get("loop") else MAX_PREVIEW_BYTES)
+        check(image["data"], image, f"{where}.previews")
     return item
 
 
@@ -355,16 +375,28 @@ def parse(document, source, now):
     # Revoked and blocked files are never shown; the client enforces the lists.
     withdrawn = set()
     for key in ("revoked", "blocklist"):
+        seen_digests = set()
         for n, entry in enumerate(root.array(key, 64, required=False) or []):
             member = Node(entry, f"index.{key}[{n}]")
-            withdrawn.add(member.text("sha256", 64, SHA256))
+            digest = member.text("sha256", 64, SHA256)
+            if digest in seen_digests:
+                member.fail("sha256", "duplicate")
+            seen_digests.add(digest)
+            if key == "revoked":
+                member.one_of("severity", SEVERITIES)
+            reason = member.get("reason", True)
+            if type(reason) is not str or len(reason) > 128 or any(ord(c) < 32 or ord(c) == 127 for c in reason):
+                member.fail("reason", "expected text of at most 128 characters")
+            member.integer("since", 1, 2 ** 40)
+            member.finish()
+            withdrawn.add(digest)
     items, seen = [], set()
     for n, entry in enumerate(root.array("items", MAX_ITEMS)):
         item = _item(entry, f"items[{n}]", source)
         if (item["kind"], item["slug"]) in seen:
             raise CatalogError(f"items[{n}]: duplicate {item['kind']} {item['slug']}")
         seen.add((item["kind"], item["slug"]))
-        if any(v["file"]["sha256"] in withdrawn for v in item["versions"][:1]):
+        if item["file"]["sha256"] in withdrawn:
             warnings.append(f"{item['kind']} {item['slug']} is revoked and not listed")
             continue
         items.append(item)
@@ -373,22 +405,25 @@ def parse(document, source, now):
 
 
 def load(live, url=LIVE_URL, key_hex=None, now=None):
-    """The catalog from the fixture, or from `url` after verifying the
-    signature under `key_hex` (130 hex digits: the catalog public key, which
-    MaiCord compiles in)."""
+    """The catalog from the fixture, or from `url`. Both are verified: the
+    live one under `key_hex` (130 hex digits: the catalog public key, which
+    MaiCord compiles in), the fixture under the throwaway key stored beside
+    it (catalog-fixture/public-key.txt)."""
     now = int(time.time()) if now is None else now
     source = Source(live, url)
     document = source.read("index.json", MAX_INDEX_BYTES)
-    if live:
-        if not key_hex:
-            raise CatalogError("the live catalog needs its public key (--catalog-key or MAICORD_CATALOG_KEY)")
-        try:
-            key = bytes.fromhex(key_hex)
-        except ValueError as error:
-            raise CatalogError("the catalog public key is not hex") from error
-        signature = source.read("index.json.sig", 64)
-        if not p256.verify(key, hashlib.sha256(DOMAIN + document).digest(), signature):
-            raise CatalogError("index: the signature does not verify")
+    if not live:
+        with open(os.path.join(FIXTURE_DIR, "public-key.txt"), encoding="ascii") as f:
+            key_hex = f.read().strip()
+    elif not key_hex:
+        raise CatalogError("the live catalog needs its public key (--catalog-key or MAICORD_CATALOG_KEY)")
+    try:
+        key = bytes.fromhex(key_hex)
+    except ValueError as error:
+        raise CatalogError("the catalog public key is not hex") from error
+    signature = source.read("index.json.sig", 64)
+    if not p256.verify(key, hashlib.sha256(DOMAIN + document).digest(), signature):
+        raise CatalogError("index: the signature does not verify")
     catalog = parse(document, source, now)
     catalog["live"] = live
     return catalog
