@@ -89,7 +89,8 @@ drives the card and the page.
   `act_messages`, `act_presence`, `clipboard`, `automated_actions`,
   `persistent_log`. The list is the full effective set, and `network` is listed
   exactly when `network[]` is not empty. The site keeps its own label and a risk level
-  (low, medium, high) for each.
+  (low, medium, high) for each. A card's "access" is the highest of its permissions, and
+  High whenever `network` is combined with any other permission.
 - `network[]` holds at most 8 unique hosts: exact (`api.example.com`) or a wildcard
   (`*.example.com`), lower-case letters, digits, hyphens and dots, with at least one dot.
 

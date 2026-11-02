@@ -35,12 +35,12 @@ KINDS = {
 
 # Permission names are the MC_PERM_* names in lower case (include/maicord/sdk/plugin_abi.h). The catalog lists the
 # full effective set, including what hooks and buttons imply. The label is the consent text's gist and the level is
-# how much the permission exposes: 0 stays on your PC, 1 reads or changes parts of your Discord data, 2 reads your
-# messages, acts for you or reaches the network.
+# how much the permission exposes: 0 stays on your PC, 1 reads or changes parts of your Discord data, 2 acts for you,
+# reaches the network or restores logged messages. A plugin's overall level is in access().
 PERMISSIONS = {
     "message_send": ("Changes your messages before they are sent", 1),
-    "read_messages": ("Reads the messages you receive", 2),
-    "message_history": ("Keeps deleted and edited messages visible", 2),
+    "read_messages": ("Reads the messages you receive", 1),
+    "message_history": ("Keeps deleted and edited messages visible", 1),
     "read_activity": ("Sees presence, voice, servers, members and friends", 1),
     "network": ("Connects to the hosts listed below", 2),
     "composer": ("Reads and changes the message box, starts replies and edits", 1),
@@ -86,8 +86,13 @@ def title_case(slug):
 
 
 def access(item):
-    """The highest level among the latest version's permissions."""
-    return max((PERMISSIONS.get(p, ("", 1))[1] for p in item["versions"][0]["permissions"]), default=0)
+    """The plugin's overall level: its highest permission level, and High whenever the network is combined with
+    any other permission, since what it reads could then leave the PC."""
+    perms = item["versions"][0]["permissions"]
+    level = max((PERMISSIONS[p][1] for p in perms), default=0)
+    if "network" in perms and len(perms) > 1:
+        level = 2
+    return level
 
 
 def authors_html(item, links=True):
