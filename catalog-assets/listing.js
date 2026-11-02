@@ -1,7 +1,7 @@
 // Search, filters and sort. Without this script the page lists every item.
 (() => {
   const form = document.getElementById("filters"), list = document.getElementById("items"),
-    count = document.getElementById("count"), empty = document.getElementById("empty"),
+    count = document.getElementById("count"), empty = document.getElementById("empty"), why = document.getElementById("why"),
     search = form.elements.q, sort = form.elements.sort, chips = [...form.querySelectorAll(".chip")],
     cards = [...list.children], params = new URLSearchParams(location.search), facets = {};
   search.value = params.get("q") || "";
@@ -26,6 +26,12 @@
     count.textContent = shown === cards.length ? `${shown} ${noun}${shown === 1 ? "" : "s"}` :
       `Showing ${shown} of ${cards.length} ${noun}s`;
     empty.hidden = shown > 0;
+    if (!shown) {
+      const parts = [];
+      if (search.value.trim()) parts.push(`“${search.value.trim()}”`);
+      for (const chip of chips) if (chip.getAttribute("aria-pressed") === "true") parts.push(chip.firstChild.textContent);
+      why.textContent = `No ${noun}s match ${parts.join(" + ")}. Try fewer words, or clear the filters.`;
+    }
     const query = new URLSearchParams();
     if (search.value.trim()) query.set("q", search.value.trim());
     for (const [facet, value] of Object.entries(facets)) query.set(facet, value);
@@ -46,6 +52,24 @@
     apply();
     search.focus();
   };
+
+  // Each row of chips is one tab stop (the pressed chip, else the first); the arrow keys, Home and End move inside it.
+  for (const row of form.querySelectorAll("[role=toolbar]")) {
+    const own = [...row.querySelectorAll(".chip")], stop = chip => own.forEach(c => c.tabIndex = c === chip ? 0 : -1);
+    stop(own.find(c => c.dataset.value === facets[c.dataset.facet]) || own[0]);
+    row.onfocusin = e => { if (own.includes(e.target)) stop(e.target); };
+    row.onkeydown = e => {
+      const steps = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }, at = own.indexOf(document.activeElement);
+      if (at < 0 || e.altKey || e.ctrlKey || e.metaKey) return;
+      let to;
+      if (e.key in steps) to = (at + steps[e.key] + own.length) % own.length;
+      else if (e.key === "Home") to = 0;
+      else if (e.key === "End") to = own.length - 1;
+      else return;
+      e.preventDefault();
+      own[to].focus();
+    };
+  }
   form.hidden = count.hidden = false;
   apply();
 })();

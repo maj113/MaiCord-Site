@@ -1,0 +1,41 @@
+/* The frame every page shares, the home page included: focus rings, the skip link, the top navigation, the
+   theme picker and the backdrop. build.py and catalog_pages.py place it where page.css or index.html say. */
+[hidden] { display: none !important; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.skip { position: absolute; z-index: 5; left: 12px; top: -64px; padding: 10px 16px; border-radius: var(--radius); background: var(--accent); color: var(--on-accent); font-weight: 600; }
+.skip:focus { top: 12px; text-decoration: none; }
+nav.top { display: flex; align-items: center; gap: 24px; height: 64px; }
+nav.top .brand { display: flex; align-items: center; gap: 10px; color: var(--text); font-weight: 600; font-size: 18px; margin-right: auto; }
+nav.top .brand:hover { text-decoration: none; }
+nav.top a:not(.brand) { color: var(--muted); font-size: 15px; }
+nav.top a:not(.brand):hover, nav.top a[aria-current] { color: var(--text); text-decoration: none; }
+nav.top a[aria-current] { text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 2px; text-underline-offset: 6px; }
+.logo { width: 28px; height: 28px; flex: none; }
+.picker { position: relative; }
+.picker > button { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 1px solid var(--line); border-radius: var(--radius); background: none; cursor: pointer; }
+.picker > button::before, .picker [role=menuitemradio]::before { content: ""; width: 18px; height: 18px; border-radius: 5px; background: linear-gradient(120deg, var(--cur)); box-shadow: inset 0 0 0 1px rgb(128 128 128 / .35); }
+.picker > button:hover, .picker > button[aria-expanded=true] { border-color: var(--muted); }
+#theme-menu { position: absolute; z-index: 3; right: 0; top: calc(100% + 8px); min-width: 176px; padding: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: 0 8px 24px rgb(0 0 0 / .3); }
+.picker [role=menuitemradio] { display: flex; align-items: center; gap: 10px; width: 100%; padding: 7px 10px; border: 0; border-radius: 6px; background: none; color: var(--text); font: inherit; font-size: 14px; text-align: left; cursor: pointer; }
+.picker [role=menuitemradio]:hover, .picker [role=menuitemradio]:focus-visible { background: var(--raised); outline-offset: -2px; }
+.picker [aria-checked=true]::after { content: "✓"; margin-left: auto; color: var(--accent); }
+/* Backdrop: the gradient, the effect canvas the script adds (.fx), else static stars: one dot per
+   tile, prime tile sizes hide the repeat. */
+.sky { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; transition: opacity .8s, visibility .8s;
+  --mid: radial-gradient(circle, rgb(var(--ink) / .25) 0 .8px, #0000 1.4px); --dim: radial-gradient(circle, rgb(var(--ink) / .12) 0 .8px, #0000 1.4px);
+  background: var(--mid) 61px 83px / 271px 317px, var(--mid) 240px 129px / 389px 347px, var(--mid) 330px 260px / 457px 433px,
+    var(--dim) 31px 47px / 233px 281px, var(--dim) 197px 11px / 307px 263px, var(--dim) 5px 220px / 359px 331px,
+    var(--dim) 290px 140px / 401px 373px, var(--dim) 120px 330px / 449px 419px,
+    linear-gradient(120deg, var(--g1), var(--g2), var(--g3)); }
+.fx .sky { background: linear-gradient(120deg, var(--g1), var(--g2), var(--g3)); }
+.sky canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+:root[data-theme=dark] .sky, :root[data-theme=light] .sky { opacity: 0; visibility: hidden; }
+@media (max-width: 960px) {
+  nav.top a.page { display: none; }
+}
+@media (max-width: 560px) {
+  nav.top { gap: 14px; }
+  nav.top .brand span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  nav.top a.hide { display: none; }
+}

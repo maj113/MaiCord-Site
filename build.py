@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
-"""Builds the site: copies site/ to the output directory, fills the
-{{placeholders}} in index.html and sitemap.xml with live data from the MaiCord
-repository (latest release, its download and size on disk, CI status and
-recent changelogs) and the theme colours (theme_tokens.py), draws the link
-preview card (og.png) and the apple-touch-icon, and generates the plugin,
-theme and effect pages (/plugins, /themes, /effects) from the catalog.
+"""Builds the site: copies site/ to the output directory, generates the
+plugin, theme and effect pages (/plugins, /themes, /effects, their detail
+pages and the two developer guides) and the 404 page from the catalog, then
+fills the {{placeholders}} in index.html and sitemap.xml with that output and
+with live data from the MaiCord repository (latest release, its download and
+size on disk, CI status and recent changelogs) and the theme colours
+(theme_tokens.py). It draws the link preview card (og.png), the
+apple-touch-icon and one card per catalog page, makes AVIF variants of the
+catalog's previews, and fails when a link, image or sitemap entry of the
+result leads nowhere (check_site.py).
 
 The output is deterministic for the same data, so the deploy workflow can
 skip a deploy when nothing changed.
@@ -34,6 +38,7 @@ import zipfile
 import card
 import catalog
 import catalog_pages
+import check_site
 import theme_tokens
 from markup import inline
 
@@ -199,6 +204,12 @@ def build(out, catalog_data):
     if os.path.exists(out):
         shutil.rmtree(out)
     shutil.copytree(os.path.join(ROOT, "site"), out)
+    card.render(f"v{latest['tag_name'].lstrip('v')} · {values['release_date_short']} · "
+                f"{values['download_size']} download · No Electron", os.path.join(out, "og.png"))
+    card.touch_icon(os.path.join(out, "apple-touch-icon.png"))
+    # The catalog pages come first: the home page and the sitemap take their navigation, shared CSS and
+    # script, catalog section and page list from them.
+    values.update(catalog_pages.build(out, catalog_data, values["theme_css"]))
     for name in TEMPLATES:
         page = os.path.join(out, name)
         with open(page, encoding="utf-8") as f:
@@ -206,12 +217,11 @@ def build(out, catalog_data):
         text = re.sub(r"\{\{(\w+)\}\}", lambda m: values[m[1]], text)
         with open(page, "w", encoding="utf-8", newline="\n") as f:
             f.write(text)
-    card.render(f"v{latest['tag_name'].lstrip('v')} · {values['release_date_short']} · "
-                f"{values['download_size']} download · No Electron", os.path.join(out, "og.png"))
-    card.touch_icon(os.path.join(out, "apple-touch-icon.png"))
     for line in catalog.warnings:
         print("catalog:", line)
-    catalog_pages.build(out, catalog_data, values["theme_css"])
+    problems = check_site.check(out)
+    if problems:
+        sys.exit("The built site is inconsistent:\n" + "\n".join(problems))
     print(f"Built {len(catalog_data['items'])} catalog items ({'live' if catalog_data['live'] else 'fixture'})")
     print(f"Built {out}: {values['version']} ({values['release_date']}), CI {values['ci_state']}")
 

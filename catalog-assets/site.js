@@ -36,10 +36,18 @@
   };
   document.addEventListener("click", e => { if (!menu.hidden && !picker.contains(e.target)) show(false); });
 
-  // Motion rests after a minute without input: the backdrop effect holds its last frame.
+  // Motion rests after a minute without input: a picture marked data-rest (the home page's animated hero,
+  // a steady AV1 decode) shows its still, and the backdrop effect holds its last frame.
+  const resting = [...document.querySelectorAll("img[data-rest]")].map(img => ({ img, live: img.getAttribute("src") }));
   let seen = performance.now();
   for (const type of ["pointermove", "keydown", "scroll", "touchstart"])
-    addEventListener(type, () => { seen = performance.now(); wake(); }, { passive: true });
+    addEventListener(type, () => {
+      seen = performance.now();
+      for (const r of resting) if (r.img.getAttribute("src") !== r.live) r.img.src = r.live;
+      wake();
+    }, { passive: true });
+  if (resting.length)
+    setInterval(() => { if (performance.now() - seen > 60000) for (const r of resting) r.img.src = r.img.dataset.rest; }, 5000);
 
   // Stars and Comets: MaiCord's fx_builtin (src/render/shaders/background_fx.hlsl) at the
   // client's default speed, density and strength, in CSS pixels where the client uses DIPs.
