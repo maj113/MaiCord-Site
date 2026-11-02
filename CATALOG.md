@@ -25,15 +25,17 @@ that contract's limits.
     python3 build.py --catalog live --catalog-key <130 hex digits>
 
 The deploy workflow passes `--catalog "$CATALOG"`: `fixture` until the release
-flip (README.md's checklist), then `live`, with the key from the repository
-variable `MAICORD_PLUGIN_CATALOG_PUBLIC_KEY`.
+flip (README.md's checklist), then `live`, with the keys from the repository
+variables `MAICORD_PLUGIN_CATALOG_PUBLIC_KEY` and
+`MAICORD_PLUGIN_CATALOG_NEXT_PUBLIC_KEY`.
 
 `--catalog live` fetches `index.json` and `index.json.sig` from the Pages root
 `https://maj113.github.io/MaiCord-plugins/` (`--catalog-url` overrides it) and
 verifies the P-256 signature (`p256.py`, standard library only) over
 `SHA-256("MaiCord plugin index v2\n" + document)` under the catalog public key
 (`--catalog-key` or `MAICORD_CATALOG_KEY`: the uncompressed point MaiCord
-compiles in). A bad signature, an expired index or a missing key fails the
+compiles in) or the next one (`--catalog-next-key` or `MAICORD_CATALOG_NEXT_KEY`,
+optional): either verifies, as in the client. A bad signature, an expired index or a missing key fails the
 build, so the hourly deploy keeps the previous site. The details and preview
 files the index names are fetched from `details/<sha256>.md` and
 `previews/<sha256>.png` next to the index and checked against the SHA-256 and
@@ -170,5 +172,6 @@ index `default`. At most 16 numeric or toggle knobs, 4 colours and 8 choices.
 - `guide.py`, `guides/` and `sync_guides.py`: the developer guides.
 - `check_site.py`: the link, image and sitemap check that ends every build.
 - `markup.py`: the escaped Markdown subset (also used for the release notes).
-- `p256.py`: signature verification.
+- `p256.py`: signature verification. `test_catalog_keys.py`: offline self-check that
+  the current and the next catalog key are both accepted (the workflow runs it).
 - `catalog-fixture.json` and `catalog-fixture/`: the signed sample catalog and its files.

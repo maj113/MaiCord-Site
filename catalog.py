@@ -404,26 +404,35 @@ def parse(document, source, now):
     return {"items": items, "sequence": sequence, "issued": issued, "expires": expires}
 
 
-def load(live, url=LIVE_URL, key_hex=None, now=None):
+def load(live, url=LIVE_URL, key_hex=None, now=None, next_key_hex=None):
     """The catalog from the fixture, or from `url`. Both are verified: the
-    live one under `key_hex` (130 hex digits: the catalog public key, which
-    MaiCord compiles in), the fixture under the throwaway key stored beside
-    it (catalog-fixture/public-key.txt)."""
+    live one under `key_hex`, the catalog public key, or `next_key_hex`, the
+    key it is rotating to (each 130 hex digits; MaiCord compiles in both and
+    accepts either, so a rotation never stops the deploy), the fixture under
+    the throwaway key stored beside it (catalog-fixture/public-key.txt)."""
     now = int(time.time()) if now is None else now
     source = Source(live, url)
     document = source.read("index.json", MAX_INDEX_BYTES)
     if not live:
         with open(os.path.join(FIXTURE_DIR, "public-key.txt"), encoding="ascii") as f:
-            key_hex = f.read().strip()
+            keys = [("the fixture key", f.read().strip())]
     elif not key_hex:
         raise CatalogError("the live catalog needs its public key (--catalog-key or MAICORD_CATALOG_KEY)")
-    try:
-        key = bytes.fromhex(key_hex)
-    except ValueError as error:
-        raise CatalogError("the catalog public key is not hex") from error
+    else:
+        keys = [("the catalog public key", key_hex)]
+        if next_key_hex and next_key_hex.strip():
+            keys.append(("the next catalog public key", next_key_hex))
+    decoded = []
+    for name, text in keys:
+        try:
+            decoded.append(bytes.fromhex(text.strip()))
+        except ValueError as error:
+            raise CatalogError(f"{name} is not hex") from error
     signature = source.read("index.json.sig", 64)
-    if not p256.verify(key, hashlib.sha256(DOMAIN + document).digest(), signature):
-        raise CatalogError("index: the signature does not verify")
+    digest = hashlib.sha256(DOMAIN + document).digest()
+    if not any(p256.verify(key, digest, signature) for key in decoded):
+        raise CatalogError("index: the signature does not verify under " + (
+            "the catalog public key" if len(decoded) == 1 else "the current or the next catalog public key"))
     catalog = parse(document, source, now)
     catalog["live"] = live
     return catalog

@@ -83,8 +83,14 @@ Until the release the catalog pages are built from the sample catalog
    index to `https://maj113.github.io/MaiCord-plugins/` (`index.json`,
    `index.json.sig`, `details/`, `previews/`).
 2. In this repository's Settings > Secrets and variables > Actions > Variables,
-   add `MAICORD_PLUGIN_CATALOG_PUBLIC_KEY`: the 130 hex digits of the catalog
-   public key, the same value MaiCord is built with.
+   add both `MAICORD_PLUGIN_CATALOG_PUBLIC_KEY` and
+   `MAICORD_PLUGIN_CATALOG_NEXT_PUBLIC_KEY`: the 130 hex digits of the catalog's
+   current and next public keys, the same values MaiCord is built with. The build
+   accepts a signature under either, as the client does, so a key rotation never
+   stops the deploy. Variables are per repository: set them here as well as in
+   the catalog repository. The build fails without the first and warns without
+   the second. `python3 test_catalog_keys.py` checks the rule offline and runs in
+   the workflow before every build.
 3. Rehearse: Actions > Deploy > Run workflow with catalog `live` and Deploy off.
    The run builds against the live catalog, verifies its signature and checks
    every link, and publishes nothing. A bad signature, an expired index, a

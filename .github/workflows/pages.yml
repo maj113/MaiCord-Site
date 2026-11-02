@@ -10,10 +10,12 @@ name: Deploy
 # (catalog-fixture.json, signed with a throwaway key, noindex) until the
 # release. To publish the real catalog, change 'fixture' to 'live' in the
 # CATALOG line below (or set the repository variable MAICORD_SITE_CATALOG to
-# live). The live build verifies the catalog's signature under the public key
-# in the repository variable MAICORD_PLUGIN_CATALOG_PUBLIC_KEY (the key
-# MaiCord compiles in; README.md has the release checklist). A manual run can
-# pick the source for that run and, with deploy off, only build and check.
+# live). The live build verifies the catalog's signature under either public
+# key in the repository variables MAICORD_PLUGIN_CATALOG_PUBLIC_KEY and
+# MAICORD_PLUGIN_CATALOG_NEXT_PUBLIC_KEY (the keys MaiCord compiles in, so a
+# key rotation never stops the deploy; README.md has the release checklist).
+# A manual run can pick the source for that run and, with deploy off, only
+# build and check.
 on:
   push:
     branches: [master]
@@ -58,15 +60,24 @@ jobs:
           python3 -m venv "$RUNNER_TEMP/venv"
           "$RUNNER_TEMP/venv/bin/pip" install --quiet --disable-pip-version-check -r requirements.txt
 
+      - name: Check the catalog key handling
+        run: '"$RUNNER_TEMP/venv/bin/python" test_catalog_keys.py'
+
       - name: Build
         env:
           GITHUB_TOKEN: ${{ github.token }}
           MAICORD_CATALOG_KEY: ${{ vars.MAICORD_PLUGIN_CATALOG_PUBLIC_KEY }}
+          MAICORD_CATALOG_NEXT_KEY: ${{ vars.MAICORD_PLUGIN_CATALOG_NEXT_PUBLIC_KEY }}
         run: |
           echo "Catalog source: $CATALOG"
-          if [ "$CATALOG" = live ] && [ -z "$MAICORD_CATALOG_KEY" ]; then
-            echo "::error::Set the MAICORD_PLUGIN_CATALOG_PUBLIC_KEY repository variable (the catalog public key MaiCord compiles in) before building the live catalog."
-            exit 1
+          if [ "$CATALOG" = live ]; then
+            if [ -z "$MAICORD_CATALOG_KEY" ]; then
+              echo "::error::Set the MAICORD_PLUGIN_CATALOG_PUBLIC_KEY repository variable (the catalog public key MaiCord compiles in) before building the live catalog."
+              exit 1
+            fi
+            if [ -z "$MAICORD_CATALOG_NEXT_KEY" ]; then
+              echo "::warning::The MAICORD_PLUGIN_CATALOG_NEXT_PUBLIC_KEY repository variable is not set: a catalog signed with the next key would fail this build."
+            fi
           fi
           "$RUNNER_TEMP/venv/bin/python" build.py --out _site --catalog "$CATALOG"
 

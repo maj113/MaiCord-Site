@@ -19,7 +19,9 @@ byte-identical between runs, and the comparison looks at pages only).
 
 The catalog is catalog-fixture.json by default (sample items, see CATALOG.md).
 --catalog live reads and verifies the signed index of maj113/MaiCord-plugins:
-the public key comes from --catalog-key or MAICORD_CATALOG_KEY, and
+the public key comes from --catalog-key or MAICORD_CATALOG_KEY, the optional
+key it is rotating to from --catalog-next-key or MAICORD_CATALOG_NEXT_KEY (a
+signature under either is accepted, as in the client), and
 --catalog-url points elsewhere (a mirror, a test server).
 
 GITHUB_TOKEN, when set, raises the API rate limit; public data needs none.
@@ -233,9 +235,10 @@ if __name__ == "__main__":
     parser.add_argument("--catalog", choices=("fixture", "live"), default="fixture")
     parser.add_argument("--catalog-url", default=catalog.LIVE_URL)
     parser.add_argument("--catalog-key", default=os.environ.get("MAICORD_CATALOG_KEY"))
+    parser.add_argument("--catalog-next-key", default=os.environ.get("MAICORD_CATALOG_NEXT_KEY"))
     args = parser.parse_args()
     try:
-        data = catalog.load(args.catalog == "live", args.catalog_url, args.catalog_key)
+        data = catalog.load(args.catalog == "live", args.catalog_url, args.catalog_key, next_key_hex=args.catalog_next_key)
     except catalog.CatalogError as error:
         sys.exit(f"Catalog: {error}")
     build(args.out, data)
