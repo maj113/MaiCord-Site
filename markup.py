@@ -5,8 +5,8 @@ import html
 import re
 
 
-def inline(text):
-    """Escapes text and renders `code`, **bold** and [links](https://...)."""
+def inline(text, emphasis=False):
+    """Escapes text and renders `code`, **bold** and [links](https://...); with `emphasis`, also *italic*."""
     out, i = [], 0
     while i < len(text):
         if text[i] == "`":
@@ -19,12 +19,18 @@ def inline(text):
         if text.startswith("**", i):
             end = text.find("**", i + 2)
             if end > 0:
-                out.append("<strong>" + inline(text[i + 2:end]) + "</strong>")
+                out.append("<strong>" + inline(text[i + 2:end], emphasis) + "</strong>")
                 i = end + 2
+                continue
+        if emphasis and text[i] == "*" and not text.startswith("**", i) and i + 1 < len(text) and not text[i + 1].isspace():
+            end = text.find("*", i + 1)
+            if end > i + 1 and not text[end - 1].isspace() and not text.startswith("**", end):
+                out.append("<em>" + inline(text[i + 1:end], emphasis) + "</em>")
+                i = end + 1
                 continue
         link = re.match(r"\[([^\]]+)\]\((https://[^)\s]+)\)", text[i:])
         if link:
-            out.append(f'<a href="{html.escape(link[2])}">{inline(link[1])}</a>')
+            out.append(f'<a href="{html.escape(link[2])}">{inline(link[1], emphasis)}</a>')
             i += link.end()
             continue
         out.append(html.escape(text[i]))
