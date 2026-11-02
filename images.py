@@ -5,7 +5,8 @@ about 1 MB). The pages offer AVIF at the sizes they display, 1x and 2x, and keep
 the PNG as the fallback for browsers without AVIF. The variants are derived from
 the PNG after its SHA-256 and size were checked against the index (catalog.py),
 and this module checks them again, so no variant can come from bytes the index
-did not sign. The output is deterministic: libavif is run with fixed settings.
+did not sign. The stills are byte-identical from run to run; libavif's animated
+loops are not, which the deploy comparison does not mind (it compares pages).
 """
 import io
 

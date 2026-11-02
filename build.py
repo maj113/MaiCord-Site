@@ -10,8 +10,9 @@ apple-touch-icon and one card per catalog page, makes AVIF variants of the
 catalog's previews, and fails when a link, image or sitemap entry of the
 result leads nowhere (check_site.py).
 
-The output is deterministic for the same data, so the deploy workflow can
-skip a deploy when nothing changed.
+The pages are deterministic for the same data, so the deploy workflow can
+skip a deploy when nothing changed (the animated AVIF loops are not
+byte-identical between runs, and the comparison looks at pages only).
 
     pip install -r requirements.txt
     python3 build.py [--out _site] [--catalog fixture|live]
