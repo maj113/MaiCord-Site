@@ -72,7 +72,7 @@ a:hover { text-decoration: underline; }
 {{chrome_css}}
 {{cards_css}}
 header.hero { padding: 28px 0 40px; }
-.status { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin: 0 0 0 auto; padding: 0 16px; min-height: 44px; box-sizing: border-box; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--muted); font-size: 14px; }
+.status { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin: 0 0 0 auto; padding: 0 16px; min-height: 44px; box-sizing: border-box; border: 1px solid var(--control-line); border-radius: 999px; background: var(--surface); color: var(--muted); font-size: 14px; }
 .status a { color: var(--text); font-weight: 600; }
 .status a.ci { color: var(--muted); font-weight: 400; }
 .status a:hover { text-decoration: none; color: var(--accent); }
@@ -86,8 +86,8 @@ h1 { font-size: clamp(34px, 6vw, 52px); line-height: 1.1; letter-spacing: -0.02e
 .button:hover { text-decoration: none; }
 .primary { background: var(--accent); color: var(--on-accent); }
 .primary:hover { background: var(--accent-hover); }
-.secondary { background: var(--raised); color: var(--text); border: 1px solid var(--line); }
-.secondary:hover { border-color: var(--muted); }
+.secondary { background: var(--control); color: var(--text); border: 1px solid var(--control-line); }
+.secondary:hover { background: var(--control-hover); border-color: var(--control-line-hover); }
 .fine { color: var(--muted); font-size: 14px; margin: 16px 0 0; }
 .narrow { display: none; }
 .shot { width: min(1120px, calc(100vw - 40px)); margin: 0 0 56px 50%; transform: translateX(-50%); }
@@ -113,8 +113,8 @@ section > p { color: var(--muted); max-width: 40em; margin: 0 0 28px; }
 .card li + li { margin-top: 4px; }
 ol.steps { margin: 0 0 24px; padding-left: 22px; }
 ol.steps li { margin-bottom: 8px; }
-code { font-family: "Cascadia Mono", Consolas, ui-monospace, monospace; font-size: 0.9em; background: var(--raised); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; }
-details { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 8px; }
+code { font-family: "Cascadia Mono", Consolas, ui-monospace, monospace; font-size: 0.9em; background: var(--control); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; }
+details { background: var(--surface); border: 1px solid var(--control-line); border-radius: var(--radius); margin-bottom: 8px; }
 summary { cursor: pointer; padding: 14px 18px; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
 summary::-webkit-details-marker { display: none; }
 summary::after { content: "+"; color: var(--muted); font-weight: 400; }
