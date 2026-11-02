@@ -6,11 +6,11 @@ name: Deploy
 # deploys only when the page changed. The custom domain (maicord.com) is set
 # in Settings > Pages, not by a CNAME file.
 #
-# The plugin, theme and effect pages are built from the sample catalog
-# (catalog-fixture.json, signed with a throwaway key, noindex) until the
-# release. To publish the real catalog, change 'fixture' to 'live' in the
-# CATALOG line below (or set the repository variable MAICORD_SITE_CATALOG to
-# live). The live build verifies the catalog's signature under either public
+# The plugin, theme and effect pages are built from the signed catalog that
+# maj113/MaiCord-plugins publishes ('live'); 'fixture' builds them from the
+# sample catalog (catalog-fixture.json, signed with a throwaway key, noindex).
+# The repository variable MAICORD_SITE_CATALOG overrides the default below.
+# The live build verifies the catalog's signature under either public
 # key in the repository variables MAICORD_PLUGIN_CATALOG_PUBLIC_KEY and
 # MAICORD_PLUGIN_CATALOG_NEXT_PUBLIC_KEY (the keys MaiCord compiles in, so a
 # key rotation never stops the deploy; README.md has the release checklist).
@@ -34,7 +34,7 @@ on:
         default: true
 
 env:
-  CATALOG: "${{ (inputs.catalog != 'default' && inputs.catalog) || vars.MAICORD_SITE_CATALOG || 'fixture' }}"
+  CATALOG: "${{ (inputs.catalog != 'default' && inputs.catalog) || vars.MAICORD_SITE_CATALOG || 'live' }}"
 
 permissions: {}
 
