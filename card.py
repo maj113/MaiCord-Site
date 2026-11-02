@@ -1,5 +1,6 @@
-"""Draws the 1200x630 link preview card (og.png) with the current release
-details, as a small palette PNG.
+"""Draws the 1200x630 link preview cards as small palette PNGs: og.png with
+the current release details, and one card per catalog page (name, kind,
+summary and its preview picture).
 
 Drawn directly with Pillow and the bundled Inter fonts rather than screenshot
 from a browser, so the output depends only on the inputs, not on whichever
@@ -108,5 +109,96 @@ def touch_icon(path, size=180):
     icon = palette(image.resize((size, size), Image.Resampling.BOX))
     data = io.BytesIO()
     icon.save(data, "PNG", optimize=True)
+    with open(path, "wb") as f:
+        f.write(oxipng.optimize_from_memory(data.getvalue(), level=6))
+
+
+def fit(draw, text, face, width, lines):
+    """`text` wrapped to `width`, at most `lines` lines; the last one ends in an ellipsis when text is cut."""
+    wrapped = wrap(draw, text, face, width)
+    if len(wrapped) <= lines:
+        return wrapped
+    last = wrapped[lines - 1]
+    while last and draw.textlength(last + "…", font=face) > width:
+        last = last[:-1].rstrip()
+    return wrapped[:lines - 1] + [last + "…"]
+
+
+def title_lines(draw, text, width):
+    """The largest bold size, 76 down to 52 pixels, at which `text` fits two lines; the size and the lines."""
+    for size in range(76, 52, -4):
+        face = font(700, size)
+        lines = wrap(draw, text, face, width)
+        if len(lines) <= 2 and all(draw.textlength(line, font=face) <= width for line in lines):
+            return face, size, lines
+    face = font(700, 52)
+    return face, 52, fit(draw, text, face, width, 2)
+
+
+def render_item(path, kind, name, summary, details, preview=None):
+    """The link preview card of one catalog page (1200x630, PNG): the kind, name, summary and a details
+    line, with the item's preview picture at the right (`preview`: its PNG bytes) or, when it has none
+    (plugins), a tile with its initial."""
+    s = SCALE
+    image = Image.new("RGB", (WIDTH * s, HEIGHT * s), BACKGROUND)
+    draw = ImageDraw.Draw(image)
+    left, top = 72 * s, 56 * s
+    right = (WIDTH - 72) * s
+    column = (528 if preview else 640) * s  # the text column's width
+    logo(draw, left, top, 44 * s, radius=13)
+    draw.text((left + 60 * s, top + 22 * s), "MaiCord", font=font(700, 28), fill=TEXT, anchor="lm")
+
+    pill = font(600, 20)
+    label = kind.upper()
+    pill_width = round(draw.textlength(label, font=pill)) + 32 * s
+    face, size, lines = title_lines(draw, name, column)
+    step = round(size * 1.12) * s
+    body = font(400, 28)
+    rows = fit(draw, summary, body, column, 4 if len(lines) < 2 else 3)
+    block = 38 * s + 26 * s + step * len(lines) + 12 * s + 40 * s * len(rows)
+    # Centred between the header (ends at 100) and the details line (starts at 556).
+    y = (100 + 556) * s // 2 - block // 2
+    draw.rounded_rectangle((left, y, left + pill_width, y + 38 * s), radius=19 * s, fill=ACCENT)
+    draw.text((left + pill_width // 2, y + 19 * s), label, font=pill, fill=(255, 255, 255), anchor="mm")
+    y += 38 * s + 26 * s
+    for line in lines:
+        draw.text((left, y + step // 2), line, font=face, fill=TEXT, anchor="lm")
+        y += step
+    y += 12 * s
+    for line in rows:
+        draw.text((left, y + 20 * s), line, font=body, fill=MUTED, anchor="lm")
+        y += 40 * s
+    small = font(400, 24)
+    draw.text((left, (HEIGHT - 52) * s), fit(draw, details, small, right - left, 1)[0], font=small, fill=MUTED, anchor="lm")
+    draw.rectangle((0, (HEIGHT - 10) * s, WIDTH * s, HEIGHT * s), fill=ACCENT)
+
+    if not preview:
+        side = 240 * s
+        x, y = right - side, (HEIGHT * s - side) // 2 - 16 * s
+        draw.rounded_rectangle((x, y, x + side, y + side), radius=56 * s, fill=(38, 38, 43), outline=(64, 64, 72), width=2 * s)
+        draw.text((x + side // 2, y + side // 2 + 6 * s), name[:1].upper(), font=font(700, 150),
+                  fill=(150, 160, 255), anchor="mm")
+    card = image.resize((WIDTH, HEIGHT), Image.Resampling.BOX)
+
+    if preview:
+        picture = Image.open(io.BytesIO(preview)).convert("RGB")
+        width = 528
+        height = round(picture.height * width / picture.width)
+        picture = picture.resize((width, height), Image.Resampling.LANCZOS)
+        x, y = WIDTH - 72 - width, (HEIGHT - 10 - height) // 2 + 8
+        mask = Image.new("L", (width * s, height * s), 0)
+        ImageDraw.Draw(mask).rounded_rectangle((0, 0, width * s - 1, height * s - 1), radius=14 * s, fill=255)
+        mask = mask.resize((width, height), Image.Resampling.BOX)
+        outline = Image.new("L", (width * s, height * s), 0)
+        ImageDraw.Draw(outline).rounded_rectangle((0, 0, width * s - 1, height * s - 1), radius=14 * s, outline=255, width=s)
+        outline = outline.resize((width, height), Image.Resampling.BOX)
+        card.paste(picture, (x, y), mask)
+        card.paste((70, 70, 78), (x, y), outline)
+        # Pictures are photographic: 256 adaptive colours, no dithering, keep the card near 100 KB.
+        card = card.quantize(colors=256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
+    else:
+        card = palette(card)
+    data = io.BytesIO()
+    card.save(data, "PNG", optimize=True)
     with open(path, "wb") as f:
         f.write(oxipng.optimize_from_memory(data.getvalue(), level=6))

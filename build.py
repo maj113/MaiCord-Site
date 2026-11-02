@@ -1,15 +1,28 @@
 #!/usr/bin/env python3
-"""Builds the site: copies site/ to the output directory, fills the
-{{placeholders}} in index.html and sitemap.xml with live data from the MaiCord
-repository (latest release, its download and size on disk, CI status and
-recent changelogs) and the theme colours (theme_tokens.py), and draws the link
-preview card (og.png) and the apple-touch-icon.
+"""Builds the site: copies site/ to the output directory, generates the
+plugin, theme and effect pages (/plugins, /themes, /effects, their detail
+pages and the two developer guides) and the 404 page from the catalog, then
+fills the {{placeholders}} in index.html and sitemap.xml with that output and
+with live data from the MaiCord repository (latest release, its download and
+size on disk, CI status and recent changelogs) and the theme colours
+(theme_tokens.py). It draws the link preview card (og.png), the
+apple-touch-icon and one card per catalog page, makes AVIF variants of the
+catalog's previews, and fails when a link, image or sitemap entry of the
+result leads nowhere (check_site.py).
 
-The output is deterministic for the same data, so the deploy workflow can
-skip a deploy when nothing changed.
+The pages are deterministic for the same data, so the deploy workflow can
+skip a deploy when nothing changed (the animated AVIF loops are not
+byte-identical between runs, and the comparison looks at pages only).
 
     pip install -r requirements.txt
-    python3 build.py [--out _site]
+    python3 build.py [--out _site] [--catalog fixture|live]
+
+The catalog is catalog-fixture.json by default (sample items, see CATALOG.md).
+--catalog live reads and verifies the signed index of maj113/MaiCord-plugins:
+the public key comes from --catalog-key or MAICORD_CATALOG_KEY, the optional
+key it is rotating to from --catalog-next-key or MAICORD_CATALOG_NEXT_KEY (a
+signature under either is accepted, as in the client), and
+--catalog-url points elsewhere (a mirror, a test server).
 
 GITHUB_TOKEN, when set, raises the API rate limit; public data needs none.
 """
@@ -26,7 +39,11 @@ import urllib.request
 import zipfile
 
 import card
+import catalog
+import catalog_pages
+import check_site
 import theme_tokens
+from markup import inline
 
 REPO = "maj113/MaiCord"
 API = "https://api.github.com/repos/" + REPO
@@ -111,33 +128,6 @@ def size_text(size):
     return f"{size / 1048576:.1f} MB"
 
 
-def inline(text):
-    """Escapes text and renders `code`, **bold** and [links](https://...)."""
-    out, i = [], 0
-    while i < len(text):
-        if text[i] == "`":
-            run = len(text[i:]) - len(text[i:].lstrip("`"))
-            end = text.find("`" * run, i + run)
-            if end > 0:
-                out.append("<code>" + html.escape(text[i + run:end].strip()) + "</code>")
-                i = end + run
-                continue
-        if text.startswith("**", i):
-            end = text.find("**", i + 2)
-            if end > 0:
-                out.append("<strong>" + inline(text[i + 2:end]) + "</strong>")
-                i = end + 2
-                continue
-        link = re.match(r"\[([^\]]+)\]\((https://[^)\s]+)\)", text[i:])
-        if link:
-            out.append(f'<a href="{html.escape(link[2])}">{inline(link[1])}</a>')
-            i += link.end()
-            continue
-        out.append(html.escape(text[i]))
-        i += 1
-    return "".join(out)
-
-
 def notes_html(body, url):
     """Renders the release notes' curated sections; counts the rest."""
     out, items, skipped, section = [], [], 0, None
@@ -173,7 +163,7 @@ def notes_html(body, url):
     return "".join(out)
 
 
-def build(out):
+def build(out, catalog_data):
     releases = [r for r in get("/releases?per_page=20") if not r["draft"]]
     stable = [r for r in releases if not r["prerelease"]]
     if not stable:
@@ -217,6 +207,12 @@ def build(out):
     if os.path.exists(out):
         shutil.rmtree(out)
     shutil.copytree(os.path.join(ROOT, "site"), out)
+    card.render(f"v{latest['tag_name'].lstrip('v')} · {values['release_date_short']} · "
+                f"{values['download_size']} download · No Electron", os.path.join(out, "og.png"))
+    card.touch_icon(os.path.join(out, "apple-touch-icon.png"))
+    # The catalog pages come first: the home page and the sitemap take their navigation, shared CSS and
+    # script, catalog section and page list from them.
+    values.update(catalog_pages.build(out, catalog_data, values["theme_css"]))
     for name in TEMPLATES:
         page = os.path.join(out, name)
         with open(page, encoding="utf-8") as f:
@@ -224,13 +220,25 @@ def build(out):
         text = re.sub(r"\{\{(\w+)\}\}", lambda m: values[m[1]], text)
         with open(page, "w", encoding="utf-8", newline="\n") as f:
             f.write(text)
-    card.render(f"v{latest['tag_name'].lstrip('v')} · {values['release_date_short']} · "
-                f"{values['download_size']} download · No Electron", os.path.join(out, "og.png"))
-    card.touch_icon(os.path.join(out, "apple-touch-icon.png"))
+    for line in catalog.warnings:
+        print("catalog:", line)
+    problems = check_site.check(out)
+    if problems:
+        sys.exit("The built site is inconsistent:\n" + "\n".join(problems))
+    print(f"Built {len(catalog_data['items'])} catalog items ({'live' if catalog_data['live'] else 'fixture'})")
     print(f"Built {out}: {values['version']} ({values['release_date']}), CI {values['ci_state']}")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", default=os.path.join(ROOT, "_site"))
-    build(parser.parse_args().out)
+    parser.add_argument("--catalog", choices=("fixture", "live"), default="fixture")
+    parser.add_argument("--catalog-url", default=catalog.LIVE_URL)
+    parser.add_argument("--catalog-key", default=os.environ.get("MAICORD_CATALOG_KEY"))
+    parser.add_argument("--catalog-next-key", default=os.environ.get("MAICORD_CATALOG_NEXT_KEY"))
+    args = parser.parse_args()
+    try:
+        data = catalog.load(args.catalog == "live", args.catalog_url, args.catalog_key, next_key_hex=args.catalog_next_key)
+    except catalog.CatalogError as error:
+        sys.exit(f"Catalog: {error}")
+    build(args.out, data)

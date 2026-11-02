@@ -1,16 +1,40 @@
 name: Deploy
 
 # Builds the site with live release and CI data from maj113/MaiCord
-# (build.py), draws the link preview card with the same details (card.py) and
-# publishes both to GitHub Pages. The hourly run picks up new
-# releases and CI results, and deploys only when the page changed. The custom
-# domain (maicord.com) is set in Settings > Pages, not by a CNAME file.
+# (build.py), draws the link preview cards (card.py) and publishes everything
+# to GitHub Pages. The hourly run picks up new releases and CI results, and
+# deploys only when the page changed. The custom domain (maicord.com) is set
+# in Settings > Pages, not by a CNAME file.
+#
+# The plugin, theme and effect pages are built from the signed catalog that
+# maj113/MaiCord-plugins publishes ('live'); 'fixture' builds them from the
+# sample catalog (catalog-fixture.json, signed with a throwaway key, noindex).
+# The repository variable MAICORD_SITE_CATALOG overrides the default below.
+# The live build verifies the catalog's signature under either public
+# key in the repository variables MAICORD_PLUGIN_CATALOG_PUBLIC_KEY and
+# MAICORD_PLUGIN_CATALOG_NEXT_PUBLIC_KEY (the keys MaiCord compiles in, so a
+# key rotation never stops the deploy; README.md has the release checklist).
+# A manual run can pick the source for that run and, with deploy off, only
+# build and check.
 on:
   push:
     branches: [master]
   schedule:
     - cron: "41 * * * *"
   workflow_dispatch:
+    inputs:
+      catalog:
+        description: Catalog source for this run (default follows the CATALOG line)
+        type: choice
+        options: [default, fixture, live]
+        default: default
+      deploy:
+        description: Deploy the result (turn off to build and check only)
+        type: boolean
+        default: true
+
+env:
+  CATALOG: "${{ (inputs.catalog != 'default' && inputs.catalog) || vars.MAICORD_SITE_CATALOG || 'live' }}"
 
 permissions: {}
 
@@ -21,7 +45,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     permissions:
       contents: read
     outputs:
@@ -36,21 +60,46 @@ jobs:
           python3 -m venv "$RUNNER_TEMP/venv"
           "$RUNNER_TEMP/venv/bin/pip" install --quiet --disable-pip-version-check -r requirements.txt
 
+      - name: Check the catalog key handling
+        run: '"$RUNNER_TEMP/venv/bin/python" test_catalog_keys.py'
+
       - name: Build
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: '"$RUNNER_TEMP/venv/bin/python" build.py --out _site'
+          MAICORD_CATALOG_KEY: ${{ vars.MAICORD_PLUGIN_CATALOG_PUBLIC_KEY }}
+          MAICORD_CATALOG_NEXT_KEY: ${{ vars.MAICORD_PLUGIN_CATALOG_NEXT_PUBLIC_KEY }}
+        run: |
+          echo "Catalog source: $CATALOG"
+          if [ "$CATALOG" = live ]; then
+            if [ -z "$MAICORD_CATALOG_KEY" ]; then
+              echo "::error::Set the MAICORD_PLUGIN_CATALOG_PUBLIC_KEY repository variable (the catalog public key MaiCord compiles in) before building the live catalog."
+              exit 1
+            fi
+            if [ -z "$MAICORD_CATALOG_NEXT_KEY" ]; then
+              echo "::warning::The MAICORD_PLUGIN_CATALOG_NEXT_PUBLIC_KEY repository variable is not set: a catalog signed with the next key would fail this build."
+            fi
+          fi
+          "$RUNNER_TEMP/venv/bin/python" build.py --out _site --catalog "$CATALOG"
 
-      # Pushes and manual runs always deploy; a scheduled run deploys only
-      # when the page differs from the live one (or the live one is unreachable).
+      # Pushes and manual runs deploy; a scheduled run deploys only when the
+      # home page or a catalog listing differs from the live one (or the live
+      # one is unreachable). A listing carries the catalog sequence, so a new
+      # catalog index always changes it. A manual run with deploy off builds
+      # and checks only.
       - name: Compare with the live site
         id: compare
         env:
           EVENT: ${{ github.event_name }}
+          DEPLOY: ${{ inputs.deploy }}
         run: |
           changed=true
-          if [ "$EVENT" = schedule ] && curl -fsS --max-time 20 https://maicord.com/ -o "$RUNNER_TEMP/live.html" &&
-             cmp -s "$RUNNER_TEMP/live.html" _site/index.html; then
+          if [ "$EVENT" = schedule ]; then
+            changed=false
+            for page in index.html plugins/index.html themes/index.html effects/index.html; do
+              curl -fsS --max-time 20 "https://maicord.com/$page" -o "$RUNNER_TEMP/live.html" &&
+                cmp -s "$RUNNER_TEMP/live.html" "_site/$page" || changed=true
+            done
+          elif [ "$DEPLOY" = false ]; then
             changed=false
           fi
           echo "changed=$changed" >> "$GITHUB_OUTPUT"

@@ -1,0 +1,9 @@
+{
+  "repository": "maj113/MaiCord",
+  "commit": "1707c90cb8bb0ab446e66b778ae6dee55241491f",
+  "date": "2026-11-02",
+  "files": {
+    "plugin-sdk.md": "include/maicord/sdk/README.md",
+    "effects.md": "samples/effects/README.md"
+  }
+}
