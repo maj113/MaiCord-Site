@@ -44,10 +44,11 @@ def wrap(draw, text, face, width):
     return lines + [line]
 
 
-def logo(draw, x, y, size):
-    """The app tile: a rounded square with the M stroke, from favicon.svg."""
+def logo(draw, x, y, size, radius=53):
+    """The app tile: a rounded square with the M stroke, from favicon.svg.
+    The corner radius is in the favicon's 176-unit grid."""
     unit = size / 176
-    draw.rounded_rectangle((x, y, x + size, y + size), radius=53 * unit, fill=ACCENT)
+    draw.rounded_rectangle((x, y, x + size, y + size), radius=radius * unit, fill=ACCENT)
     points = [(x + px * unit, y + py * unit)
               for px, py in ((49.3, 125), (49.3, 54.6), (88, 96.8), (126.7, 54.6), (126.7, 125))]
     stroke = 25 * unit
