@@ -67,6 +67,8 @@
     Object.assign(button, { type: "button", className: "dd-button" });
     for (const [name, value] of [["role", "combobox"], ["aria-haspopup", "listbox"], ["aria-expanded", "false"],
       ["aria-controls", id + "-list"], ["aria-labelledby", `${label.id} ${text.id}`]]) button.setAttribute(name, value);
+    // The sort icon shows instead of the "Sort by" label on narrow screens (page.css).
+    button.insertAdjacentHTML("beforeend", '<svg class="dd-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 4.5h10M5 8h6M7 11.5h2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>');
     button.append(text);
     button.insertAdjacentHTML("beforeend", '<svg class="dd-chevron" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>');
     Object.assign(menu, { id: id + "-list", className: "dd-list", hidden: true, tabIndex: -1 });
@@ -184,6 +186,21 @@
       own[to].focus();
     };
   }
+  // On narrow screens each row of chips scrolls sideways (page.css); a fade at an edge says there is more that way.
+  const scrollers = [...form.querySelectorAll(".chips")], edges = () => {
+    for (const s of scrollers) {
+      s.parentElement.classList.toggle("more-start", s.scrollLeft > 2);
+      s.parentElement.classList.toggle("more-end", s.scrollLeft + s.clientWidth < s.scrollWidth - 2);
+    }
+  };
+  for (const s of scrollers) s.addEventListener("scroll", edges, { passive: true });
+  addEventListener("resize", edges);
   form.hidden = count.hidden = false;
   apply();
+  // A filter from the address (?cat=...) starts with its chip in view.
+  for (const s of scrollers) {
+    const on = s.querySelector("[aria-pressed=true]");
+    if (on && s.scrollWidth > s.clientWidth) s.scrollLeft = on.offsetLeft - s.clientWidth / 2 + on.offsetWidth / 2;
+  }
+  edges();
 })();

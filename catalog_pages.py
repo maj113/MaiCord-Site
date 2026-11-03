@@ -118,8 +118,17 @@ def bytes_text(size):
     return f"{size} B" if size < 1024 else f"{size / 1024:.1f} KB" if size < 1048576 else f"{size / 1048576:.1f} MB"
 
 
+# Category slugs that are acronyms or proper names, shown in their usual form (the catalog data keeps its slugs).
+ACRONYMS = {"oled": "OLED", "amoled": "AMOLED", "ui": "UI", "ux": "UX", "rpc": "RPC", "url": "URL", "urls": "URLs",
+            "dm": "DM", "dms": "DMs", "api": "API", "gpu": "GPU", "cpu": "CPU", "nsfw": "NSFW", "ascii": "ASCII",
+            "css": "CSS", "hdr": "HDR", "tts": "TTS", "ai": "AI", "gif": "GIF", "gifs": "GIFs", "vc": "VC",
+            "wcag": "WCAG", "fps": "FPS", "crt": "CRT", "vhs": "VHS", "rgb": "RGB", "id": "ID", "ids": "IDs"}
+
+
 def title_case(slug):
-    return slug.replace("-", " ").capitalize()
+    """A category slug as a label: `chat-bar` is "Chat bar", `oled` is "OLED"."""
+    text = " ".join(ACRONYMS.get(w, w) for w in slug.split("-"))
+    return text[:1].upper() + text[1:]
 
 
 def access(item):
@@ -380,7 +389,8 @@ def listing(site, kind):
     for key, label, values in facets(kind, items):
         chips = "".join(f'<button type="button" class="chip" data-facet="{key}" data-value="{esc(v)}" aria-pressed="false">'
                         f'{esc(name)}<small aria-hidden="true">{count}</small></button>' for v, name, count in values)
-        rows += f'<div class="row" role="toolbar" aria-labelledby="f-{key}"><span class="label" id="f-{key}">{label}</span>{chips}</div>'
+        rows += (f'<div class="row" role="toolbar" aria-labelledby="f-{key}"><span class="label" id="f-{key}">{label}</span>'
+                 f'<div class="chips">{chips}</div></div>')
     cards = "".join(card(i) for i in items)
     if site.live:
         stamp = (f'Catalog issued {date_text(site.catalog["issued"])}. Items are listed from MaiCord\'s signed catalog; '
@@ -388,13 +398,13 @@ def listing(site, kind):
     else:
         stamp = "Sample build: this catalog is signed with a throwaway key and is not published yet."
     heading, text, label, target = info["build"]
-    body = f"""<header>
+    body = f"""<header class="listhead">
 <h1>{info["title"]}</h1>
 <p class="lead">{info["lead"]}</p>
 <p class="actions"><a class="button secondary" href="{target}">{heading}</a></p>
 </header>
 <form id="filters" class="filters" role="search" hidden>
-  <div class="row">
+  <div class="row searchrow">
     <label class="sr" for="q">Search {info["title"].lower()}</label>
     <input id="q" name="q" type="search" placeholder="Search {info["title"].lower()}" autocomplete="off">
     <span class="sortbox"><label class="label" for="sort">Sort by</label>

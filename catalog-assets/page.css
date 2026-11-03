@@ -42,6 +42,8 @@ footer p { margin: 0; }
 .filters .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
 .filters .label { color: var(--muted); font-size: 14px; margin-right: 4px; }
 .sortbox { display: inline-flex; align-items: center; gap: 6px; }
+.chips { display: contents; }
+.dd-icon { display: none; }
 input[type=search], select { height: 44px; border: 1px solid var(--control-line); border-radius: var(--radius); background: var(--control); color: var(--text); font: inherit; font-size: 15px; padding: 0 14px; }
 input[type=search]:hover, select:hover { border-color: var(--control-line-hover); }
 option { background: var(--surface); color: var(--text); }
@@ -173,6 +175,35 @@ dl.facts dd { margin: 0; overflow-wrap: anywhere; }
   .preview { grid-template-columns: 1fr; }
   .cards { grid-template-columns: 1fr; }
   .choices { grid-template-columns: 1fr; }
+}
+/* Narrow screens: a compact header, the search and the sort on one row, and each filter group as one row of chips that
+   scrolls sideways under a fixed label, with a fade where more chips wait. */
+@media (max-width: 640px) {
+  nav.top { height: 56px; }
+  .sample { margin: 0 0 12px; padding: 6px 12px; font-size: 13px; }
+  .listhead { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "title action" "lead lead"; align-items: center; gap: 0 12px; margin: 0 0 14px; }
+  .listhead h1 { grid-area: title; font-size: 30px; margin: 0; }
+  .listhead .lead { grid-area: lead; font-size: 15px; line-height: 1.45; margin: 6px 0 0; }
+  .listhead .actions { grid-area: action; margin: 0; }
+  .listhead .actions .button { min-height: 36px; padding: 0 14px; font-size: 14px; }
+  .filters { gap: 10px; margin: 0 0 10px; }
+  .filters .searchrow { flex-wrap: nowrap; gap: 8px; }
+  input[type=search], select { height: 40px; font-size: 16px; }
+  input[type=search] { flex: 1 1 0; }
+  .sortbox .label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .dd-button { height: 40px; min-width: 0; padding: 0 10px 0 12px; gap: 8px; font-size: 15px; }
+  .dd-icon { display: block; flex: none; width: 16px; height: 16px; color: var(--chevron); }
+  .dd-button > span { margin-right: 2px; }
+  .filters .row:not(.searchrow) { display: grid; grid-template-columns: 4.6em minmax(0, 1fr); align-items: center; }
+  .filters .label { margin: 0; font-size: 13px; }
+  .chips { position: relative; display: flex; gap: 8px; margin: -4px -20px -4px -4px; padding: 4px 20px 4px 4px; overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .chips::-webkit-scrollbar { display: none; }
+  .more-end .chips { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 40px), transparent); }
+  .more-start .chips { -webkit-mask-image: linear-gradient(90deg, transparent, #000 28px); mask-image: linear-gradient(90deg, transparent, #000 28px); }
+  .more-start.more-end .chips { -webkit-mask-image: linear-gradient(90deg, transparent, #000 28px, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(90deg, transparent, #000 28px, #000 calc(100% - 40px), transparent); }
+  .chip { flex: none; min-height: 32px; padding: 0 12px; font-size: 13px; white-space: nowrap; }
+  .chip small { margin-left: 5px; font-size: 11px; }
+  #count { margin: 0 0 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
