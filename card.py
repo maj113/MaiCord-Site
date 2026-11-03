@@ -29,7 +29,7 @@ MAXIMUM_COLOURS = 64
 
 
 def font(weight, size):
-    return ImageFont.truetype(os.path.join(FONTS, f"inter-latin-{weight}-normal.woff2"), size * SCALE)
+    return ImageFont.truetype(os.path.join(FONTS, f"inter-{weight}-normal.woff2"), size * SCALE)
 
 
 def wrap(draw, text, face, width):
