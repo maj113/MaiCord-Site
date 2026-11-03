@@ -149,6 +149,15 @@ index `default`. At most 16 numeric or toggle knobs, 4 colours and 8 choices.
 - **Keyboard.** The filter chips form one tab stop per row; the arrow keys,
   Home and End move along it. Every control has a focus ring, and the page has
   a skip link.
+- **Narrow screens (up to 640 px).** The title and the "make one" button share a
+  row, the search and a compact sort button (icon and current value) share the
+  next, and each filter group is one sideways-scrolling row of smaller chips
+  under a fixed label, with a fade at the edge that has more and no scrollbar.
+  The chips are the same buttons with `aria-pressed`, so the keyboard behaviour
+  is the desktop's. A filter in the address (`?cat=privacy`) starts in view.
+- **Chip labels.** Category slugs become labels in `title_case()`;
+  `ACRONYMS` in `catalog_pages.py` spells known ones properly (`oled` is OLED,
+  `rpc` is RPC). Add a slug there when a new acronym shows up in the catalog.
 - **Install hint.** "Install in MaiCord" is a plain `maicord://` link. With
   the script, when the page keeps the focus for three seconds after the click
   (nothing opened, or the browser's prompt is still up), a hint says MaiCord
