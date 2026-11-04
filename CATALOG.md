@@ -29,7 +29,9 @@ flip (README.md's checklist), then `live`, with the keys from the repository
 variables `MAICORD_PLUGIN_CATALOG_PUBLIC_KEY` and
 `MAICORD_PLUGIN_CATALOG_NEXT_PUBLIC_KEY`.
 
-`--catalog live` fetches `index.json` and `index.json.sig` from the Pages root
+`--catalog live` fetches `index-full.json` and `index-full.json.sig` (the index
+MaiCord 0.6.3 and later read; `index.json`, for 0.6.0 to 0.6.2, leaves out the
+effects they can't run) from the Pages root
 `https://maj113.github.io/MaiCord-plugins/` (`--catalog-url` overrides it) and
 verifies the P-256 signature (`p256.py`, standard library only) over
 `SHA-256("MaiCord plugin index v2\n" + document)` under the catalog public key
@@ -43,7 +45,7 @@ size it lists. The packages under `files/` are not needed to build the pages.
 
 The fixture is a real format-2 build of `maj113/MaiCord-plugins` (27 plugins, 6
 themes, 7 effects), signed with a throwaway key: `catalog-fixture.json` is the
-index byte for byte, and `catalog-fixture/` holds its `index.json.sig`, the
+index byte for byte, and `catalog-fixture/` holds its `index-full.json.sig`, the
 throwaway `public-key.txt` (the build verifies the signature under it), and the
 `details/` and `previews/` files. Fixture builds mark every catalog page
 `noindex` and show a "Sample data" note. Delete the fixture and the note once
@@ -112,9 +114,13 @@ and `effect?` (an effect slug, linked both ways when the effect is listed).
 
 Effects also have `cost` (`light`, `medium`, `heavy`), `blend` (`normal`,
 `screen`, `add`), `uses[]` (`noise`, `glyphs`, `blue_noise`, `pointer`,
-`texture0`, `texture1`), `knobs[]` and `loop?` (`{sha256, bytes <= 2 MiB, width,
+`texture0`, `texture1`), `knobs[]`, `loop?` (`{sha256, bytes <= 2 MiB, width,
 height, fps (1 to 60), seconds (integer, 1 to 10)}`, an APNG shown on the detail
-page, with the first preview as the still for reduced motion).
+page, with the first preview as the still for reduced motion) and `interface?`
+(1 to 65535, default 1: the `.mcfx` interface the package needs). Above 1 the
+page says which MaiCord it needs (`catalog.INTERFACE_RELEASES`: 2 and 3 are
+0.6.3), in the facts and under the install button; an interface missing from
+that table warns and reads "a newer MaiCord".
 
 A knob is `{id, type, label}`: `id` is `[a-z][a-z0-9_]*` up to 24 characters and
 `label` up to 48. By type: `float` and `int` have `min`, `max` and `default` with

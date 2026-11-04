@@ -80,8 +80,8 @@ Until the release the catalog pages are built from the sample catalog
 `noindex`, and the sitemap leaves them out. To publish the real catalog:
 
 1. The catalog repository (`maj113/MaiCord-plugins`) has published its signed
-   index to `https://maj113.github.io/MaiCord-plugins/` (`index.json`,
-   `index.json.sig`, `details/`, `previews/`).
+   index to `https://maj113.github.io/MaiCord-plugins/` (`index-full.json`,
+   `index-full.json.sig`, `details/`, `previews/`).
 2. In this repository's Settings > Secrets and variables > Actions > Variables,
    add both `MAICORD_PLUGIN_CATALOG_PUBLIC_KEY` and
    `MAICORD_PLUGIN_CATALOG_NEXT_PUBLIC_KEY`: the 130 hex digits of the catalog's

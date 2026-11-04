@@ -460,6 +460,11 @@ def detail(site, item):
     kind, slug = item["kind"], item["slug"]
     info, version = KINDS[kind], item["versions"][0]
     link = f"maicord://install/{kind}/{slug}"
+    # An effect whose package needs a .mcfx interface MaiCord 0.6.0 to 0.6.2 don't have (only the full index lists it).
+    needs = None
+    if kind == "effect" and item["interface"] > 1:
+        release = catalog.INTERFACE_RELEASES.get(item["interface"])
+        needs = f"MaiCord {release} or later" if release else "a newer MaiCord"
 
     previews = ""
     if item["shots"]:
@@ -522,6 +527,8 @@ def detail(site, item):
         facts += [("Cost", f'{COSTS[item["cost"]]}, {COST_NOTES[item["cost"]]}'), ("Blend", BLENDS[item["blend"]])]
         if item["uses"]:
             facts.append(("Uses", esc(", ".join(USES[u] for u in item["uses"]))))
+        if needs:
+            facts.append(("Needs", needs))
     if item["homepage"]:
         facts.append(("Website", f'<a href="{esc(item["homepage"])}">{esc(item["homepage"].split("/")[2])}</a>'))
     facts.append(("SHA-256", f'<code>{item["file"]["sha256"]}</code>'))
@@ -537,7 +544,7 @@ def detail(site, item):
 <aside>
   <div class="panel install">
     <a class="button primary" id="install" href="{link}">Install in MaiCord</a>
-    <p class="fine">Opens MaiCord, which shows what you are installing and asks before it changes anything.</p>
+    <p class="fine">Opens MaiCord, which shows what you are installing and asks before it changes anything.{f" This effect needs {needs}." if needs else ""}</p>
     <p class="linkrow"><code id="link">{link}</code><button type="button" class="button secondary" id="copy" hidden>Copy link</button><span id="copied" role="status"></span></p>
     <div role="status"><div class="hint" id="hint" hidden><strong>Nothing opened?</strong><p>MaiCord may not be installed, or your browser blocked the prompt that asks to open it. <a href="../../#install">Get MaiCord</a>, allow the prompt and try again, or find this {info["noun"]} in MaiCord's Browse tab.</p></div></div>
     <p class="fine" id="help">Nothing happens? MaiCord asks the first time whether it may open <code>maicord://</code> links, so until you agree, copy the link or find this {info["noun"]} in MaiCord's Browse tab. <a href="../../#install">Get MaiCord</a></p>
