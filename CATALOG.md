@@ -29,9 +29,9 @@ flip (README.md's checklist), then `live`, with the keys from the repository
 variables `MAICORD_PLUGIN_CATALOG_PUBLIC_KEY` and
 `MAICORD_PLUGIN_CATALOG_NEXT_PUBLIC_KEY`.
 
-`--catalog live` fetches `index-full.json` and `index-full.json.sig` (the index
-MaiCord 0.6.3 and later read; `index.json`, for 0.6.0 to 0.6.2, leaves out the
-effects they can't run) from the Pages root
+`--catalog live` fetches `index-3.json` and `index-3.json.sig` (the index
+MaiCord 0.6.4 and later read; `index-full.json`, for 0.6.3, and `index.json`, for
+0.6.0 to 0.6.2, leave out what those can't run) from the Pages root
 `https://maj113.github.io/MaiCord-plugins/` (`--catalog-url` overrides it) and
 verifies the P-256 signature (`p256.py`, standard library only) over
 `SHA-256("MaiCord plugin index v2\n" + document)` under the catalog public key
@@ -45,7 +45,7 @@ size it lists. The packages under `files/` are not needed to build the pages.
 
 The fixture is a real format-2 build of `maj113/MaiCord-plugins` (27 plugins, 6
 themes, 7 effects), signed with a throwaway key: `catalog-fixture.json` is the
-index byte for byte, and `catalog-fixture/` holds its `index-full.json.sig`, the
+index byte for byte, and `catalog-fixture/` holds its `index-3.json.sig`, the
 throwaway `public-key.txt` (the build verifies the signature under it), and the
 `details/` and `previews/` files. Fixture builds mark every catalog page
 `noindex` and show a "Sample data" note. Delete the fixture and the note once

@@ -27,10 +27,10 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 FIXTURE_INDEX = os.path.join(ROOT, "catalog-fixture.json")
 FIXTURE_DIR = os.path.join(ROOT, "catalog-fixture")
 LIVE_URL = "https://maj113.github.io/MaiCord-plugins/"
-# The index MaiCord 0.6.3 and later read: every item, an effect with the .mcfx
-# interface its package needs. index.json, for 0.6.0 to 0.6.2, leaves out the
-# effects they can't run, so the site reads this one.
-INDEX = "index-full.json"
+# The index MaiCord 0.6.4 and later read: every item, with the interface each
+# one needs (index-full.json, for 0.6.3, and index.json, for 0.6.0 to 0.6.2,
+# leave out what those can't run), so the site reads this one.
+INDEX = "index-3.json"
 # The index signature covers SHA-256(DOMAIN + document), as format 1 does with
 # its "v1" domain (catalog format 2, local://prog/catalog-format2.md).
 DOMAIN = b"MaiCord plugin index v2\n"
@@ -54,8 +54,8 @@ COSTS = ("light", "medium", "heavy")
 BLENDS = ("normal", "screen", "add")
 BASES = ("dark", "light", "amoled")
 USES = ("noise", "glyphs", "blue_noise", "pointer", "texture0", "texture1")
-# The first MaiCord release that runs each .mcfx interface above 1.
-INTERFACE_RELEASES = {2: "0.6.3", 3: "0.6.3"}
+# The first MaiCord release that runs each interface above 1, per item kind.
+INTERFACE_RELEASES = {"effect": {2: "0.6.3", 3: "0.6.3"}, "theme": {2: "0.6.4"}}
 KNOB_TYPES = ("float", "int", "toggle", "color", "choice")
 # The format 2 limits for knob scalars, colours and choices.
 KNOB_LIMITS = {"scalar": 16, "color": 4, "choice": 8}
@@ -344,9 +344,9 @@ def _item(raw, where, source):
             item["knobs"] = _knobs(node.array("knobs", sum(KNOB_LIMITS.values())), f"{where}.knobs")
             loop = node.get("loop", False)
             item["loop"] = loop and _image(loop, f"{where}.loop", MAX_LOOP_BYTES, True)
-            item["interface"] = node.integer("interface", 1, 0xFFFF, required=False) or 1
-            if item["interface"] > 1 and item["interface"] not in INTERFACE_RELEASES:
-                warnings.append(f"{where}: interface {item['interface']} has no release in INTERFACE_RELEASES")
+    item["interface"] = node.integer("interface", 1, 0xFFFF, required=False) or 1
+    if item["interface"] > 1 and item["interface"] not in INTERFACE_RELEASES.get(kind, {}):
+        warnings.append(f"{where}: interface {item['interface']} has no release in INTERFACE_RELEASES")
     for key in ("version", "released", "changelog", "file"):
         item[key] = latest[key]
     node.finish()

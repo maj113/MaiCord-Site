@@ -460,10 +460,10 @@ def detail(site, item):
     kind, slug = item["kind"], item["slug"]
     info, version = KINDS[kind], item["versions"][0]
     link = f"maicord://install/{kind}/{slug}"
-    # An effect whose package needs a .mcfx interface MaiCord 0.6.0 to 0.6.2 don't have (only the full index lists it).
+    # An item that needs an interface older MaiCord releases don't have (only the newer indexes list it).
     needs = None
-    if kind == "effect" and item["interface"] > 1:
-        release = catalog.INTERFACE_RELEASES.get(item["interface"])
+    if item["interface"] > 1:
+        release = catalog.INTERFACE_RELEASES.get(kind, {}).get(item["interface"])
         needs = f"MaiCord {release} or later" if release else "a newer MaiCord"
 
     previews = ""
